@@ -153,7 +153,7 @@
                                 <label id="lblUploadDocs" class="block text-sm font-medium mb-1">Upload Medical Reports / Smart Card (PDF Only) *</label>
                                 <input type="file" id="pDoc" accept=".pdf" required class="w-full p-2 border rounded bg-gray-50 text-sm">
                                 <span id="lblFileRestrictionNote" class="block text-xs font-bold text-red-600 mt-1 leading-normal">
-                                    ⚠️ Maximum file size: 10 MB. Please compile all necessary documents into a single PDF file before uploading.
+                                    ⚠️ Maximum file size: 5 MB. Please compile all necessary documents into a single PDF file before uploading.
                                 </span>
                             </div>
                             
@@ -204,7 +204,7 @@
                             <span class="bg-red-600 text-white text-[10px] font-bold px-1.5 py-0.5 rounded flash-text uppercase">IMPORTANT</span>
                             <p class="text-xs font-bold text-amber-950 mt-1">BMHRC Smart Card & PDF Guidelines</p>
                             <p class="text-[11px] text-gray-700 mt-1 leading-relaxed">
-                                कृपया आवेदन जमा करने से पहले अपने सभी मेडिकल पेपर्स एवं BMHRC कार्ड की एक ही 10MB तक की PDF बनाकर अपलोड करें।
+                                कृपया आवेदन जमा करने से पहले अपने सभी मेडिकल पेपर्स एवं BMHRC कार्ड की एक ही 5MB तक की PDF बनाकर अपलोड करें।
                             </p>
                             <span class="text-[9px] text-gray-400 font-mono block mt-1">July 2026</span>
                         </div>
@@ -357,11 +357,11 @@
                             <div class="space-y-3 text-xs">
                                 <div class="p-2 bg-gray-50 border rounded flex justify-between items-center">
                                     <div><span class="font-bold">Original Submission PDF:</span><br><span id="dAuditOrigName" class="font-mono text-gray-500"></span></div>
-                                    <button onclick="openUploadedPDFTarget(selectedApplicationId, 'ORIGINAL')" class="bg-blue-800 text-white px-2 py-1 rounded font-semibold text-[11px] hover:bg-blue-700">Open</button>
+                                    <button onclick="openBase64PDFTarget(selectedApplicationId, 'ORIGINAL')" class="bg-blue-800 text-white px-2 py-1 rounded font-semibold text-[11px] hover:bg-blue-700 cursor-pointer">Open</button>
                                 </div>
                                 <div id="dAuditNewFileWrapper" class="p-2 bg-emerald-50 border border-emerald-200 rounded flex justify-between items-center hidden-section">
                                     <div><span class="font-bold text-emerald-900">Corrected Re-upload PDF:</span><br><span id="dAuditNewName" class="font-mono text-emerald-700"></span></div>
-                                    <button onclick="openUploadedPDFTarget(selectedApplicationId, 'NEW')" class="bg-emerald-700 text-white px-2 py-1 rounded font-semibold text-[11px] hover:bg-emerald-600">Open</button>
+                                    <button onclick="openBase64PDFTarget(selectedApplicationId, 'NEW')" class="bg-emerald-700 text-white px-2 py-1 rounded font-semibold text-[11px] hover:bg-emerald-600 cursor-pointer">Open</button>
                                 </div>
                                 <div>
                                     <span class="font-bold block text-gray-600 mb-1">Internal Office Orders & Notes:</span>
@@ -421,12 +421,12 @@
                                 <div class="bg-white p-3 border border-gray-200 rounded text-center flex flex-col justify-between items-center shadow-xs">
                                     <span class="text-[10px] font-bold text-gray-500 block mb-1">ORIGINAL SUBMISSION</span>
                                     <span id="vFileName" class="text-xs font-mono font-medium text-blue-700 truncate max-w-xs block mb-2">document_upload.pdf</span>
-                                    <button onclick="openUploadedPDF('ORIGINAL')" class="bg-blue-100 hover:bg-blue-200 text-blue-800 text-[11px] px-3 py-1.5 rounded border border-blue-300 font-bold cursor-pointer transition">📄 View Original PDF</button>
+                                    <button onclick="openBase64PDFTarget(selectedApplicationId, 'ORIGINAL')" class="bg-blue-100 hover:bg-blue-200 text-blue-800 text-[11px] px-3 py-1.5 rounded border border-blue-300 font-bold cursor-pointer transition">📄 View Original PDF</button>
                                 </div>
                                 <div id="vNewFileContainer" class="bg-gray-100 p-3 border border-dashed border-gray-300 rounded text-center flex flex-col justify-between items-center opacity-50">
                                     <span class="text-[10px] font-bold text-amber-700 block mb-1">CORRECTED / RE-UPLOADED</span>
                                     <span id="vNewFileName" class="text-xs font-mono font-medium text-gray-500 truncate max-w-xs block mb-2">None submitted yet</span>
-                                    <button id="btnOpenNewPdf" disabled onclick="openUploadedPDF('NEW')" class="bg-amber-100 text-amber-800 text-[11px] px-3 py-1.5 rounded border border-amber-300 font-bold cursor-not-allowed transition">📄 View Updated PDF</button>
+                                    <button id="btnOpenNewPdf" disabled onclick="openBase64PDFTarget(selectedApplicationId, 'NEW')" class="bg-amber-100 text-amber-800 text-[11px] px-3 py-1.5 rounded border border-amber-300 font-bold cursor-not-allowed transition">📄 View Updated PDF</button>
                                 </div>
                             </div>
                         </div>
@@ -511,7 +511,7 @@
     <!-- ================= FIREBASE REALTIME ENGINE MODULE ================= -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-        import { getFirestore, collection, addDoc, updateDoc, doc, onSnapshot, setDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+        import { getFirestore, collection, updateDoc, doc, onSnapshot, setDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
         // Firebase Configuration Credentials
         const firebaseConfig = {
@@ -531,7 +531,6 @@
         // 1. Save New Patient Application to Cloud Firestore
         window.saveAppToCloud = async function(appData) {
             try {
-                // Save document using Application Number (appNo) as Document ID
                 await setDoc(doc(db, "applications", appData.appNo), appData);
                 return true;
             } catch (e) {
@@ -552,17 +551,15 @@
             }
         };
 
-        // 3. Real-Time Live Listener (Instant Push to all Admin/Dept screens)
+        // 3. Real-Time Live Listener
         window.listenToCloudData = function() {
             onSnapshot(collection(db, "applications"), (snapshot) => {
                 const liveApps = [];
                 snapshot.forEach((doc) => {
                     liveApps.push(doc.data());
                 });
-                // Sync cloud state to local storage memory
                 localStorage.setItem('applications_db', JSON.stringify(liveApps));
                 
-                // Refresh active dashboards instantly
                 updateDashboard();
                 if (window.loggedInDeptUser === 'director_admin') {
                     if (typeof window.loadDirectorDashboard === 'function') window.loadDirectorDashboard();
@@ -572,14 +569,13 @@
             });
         };
 
-        // Auto Start Live Synchronization on Page Load
         window.listenToCloudData();
     </script>
 
     <!-- ================= JAVASCRIPT SYSTEM ENGINE ================= -->
     <script>
         let currentLang = 'en';
-        let isCurrentSessionESigned = false; // Runtime security variable tracking digital signatures
+        let isCurrentSessionESigned = false;
         window.loggedInDeptUser = null;
 
         const translations = {
@@ -591,7 +587,7 @@
                 lblEnterOtp: "Enter OTP (Sent to mobile) *", verifyOtpBtn: "Verify", lblAadhaarNumber: "Aadhaar Number *",
                 lblAilmentType: "Ailment Type *", optSelectAilment: "-- Select Diagnosis --", optKidney: "Kidney Ailment", optPulmonary: "Cancer / Pulmonary Ailment",
                 lblBmhrcCard: "BMHRC Card Number (8 Digit) *", lblUploadDocs: "Upload Medical Reports / Smart Card (PDF Only) *",
-                lblFileRestrictionNote: "⚠️ Maximum file size: 10 MB. Please compile all necessary documents into a single PDF file before uploading.",
+                lblFileRestrictionNote: "⚠️ Maximum file size: 5 MB. Please compile all necessary documents into a single PDF file before uploading.",
                 lblCaptcha: "Security CAPTCHA:", btnRefreshCaptcha: "Refresh", captchaInput_placeholder: "Enter Captcha",
                 btnSubmitApp: "Submit Application", lblSuccessTitle: "✓ Application Submitted Successfully!",
                 lblAppNumberText: "Your unique Application Number is:", lblSuccessNote: "Kindly note this down to track your live status.",
@@ -617,7 +613,7 @@
                 lblEnterOtp: "ओटीपी दर्ज करें (मोबाइल पर भेजा गया) *", verifyOtpBtn: "सत्यापित करें", lblAadhaarNumber: "आधार संख्या *",
                 lblAilmentType: "बीमारी का प्रकार *", optSelectAilment: "-- बीमारी/निदान चुनें --", optKidney: "किडनी (गुर्दे) की बीमारी", optPulmonary: "कैंसर / फेफड़े (पल्मोनरी) की बीमारी",
                 lblBmhrcCard: "BMHRC कार्ड संख्या (8 डिजिट) *", lblUploadDocs: "मेडिकल रिपोर्ट / स्मार्ट कार्ड अपलोड करें (केवल PDF) *",
-                lblFileRestrictionNote: "⚠️ अधिकतम फ़ाइल आकार: 10 MB। कृपया अपलोड करने से पहले सभी आवश्यक दस्तावेजों को एक ही पीडीएफ फाइल में संकलित (Compile) करके अपलोड करें।",
+                lblFileRestrictionNote: "⚠️ अधिकतम फ़ाइल आकार: 5 MB। कृपया अपलोड करने से पहले सभी आवश्यक दस्तावेजों को एक ही पीडीएफ फाइल में संकलित (Compile) करके अपलोड करें।",
                 lblCaptcha: "सुरक्षा कैप्चा:", btnRefreshCaptcha: "रिफ्रेश", captchaInput_placeholder: "कैप्चा कोड भरें",
                 btnSubmitApp: "आवेदन जमा करें", lblSuccessTitle: "✓ आवेदन सफलतापूर्वक जमा हो गया है!",
                 lblAppNumberText: "आपका विशिष्ट आवेदन नंबर है:", lblSuccessNote: "कृपया लाइव स्थिति ट्रैक करने के लिए इसे नोट कर लें।",
@@ -637,6 +633,39 @@
             }
         };
 
+        // Helper function to convert File to Base64 String
+        function fileToBase64(file) {
+            return new Promise((resolve, reject) => {
+                const reader = new FileReader();
+                reader.readAsDataURL(file);
+                reader.onload = () => resolve(reader.result);
+                reader.onerror = error => reject(error);
+            });
+        }
+
+        // Global function to open Base64 PDFs in a new tab safely
+        window.openBase64PDFTarget = function(appNo, fileType) {
+            const db = JSON.parse(localStorage.getItem('applications_db')) || [];
+            const app = db.find(a => a.appNo === appNo);
+            if (!app) { alert("Application record not found."); return; }
+
+            let base64Data = "";
+            if (fileType === 'ORIGINAL') base64Data = app.fileBase64;
+            else if (fileType === 'NEW') base64Data = app.newFileBase64;
+            else {
+                // If opening internal uploaded dept file
+                const deptFile = (app.deptFiles || []).find(f => f.id === fileType);
+                if (deptFile) base64Data = deptFile.fileBase64;
+            }
+
+            if (base64Data) {
+                const pdfWindow = window.open("");
+                pdfWindow.document.write(`<iframe width='100%' height='100%' src='${base64Data}'></iframe>`);
+            } else {
+                alert("File content missing or corrupted.");
+            }
+        };
+
         function changeLanguage() {
             currentLang = document.getElementById('langSelect').value;
             const langData = translations[currentLang];
@@ -653,9 +682,6 @@
             document.getElementById('deptRemarks').placeholder = langData['deptRemarks_placeholder'];
         }
 
-        const activeFileBlobs = {};
-
-        // INITIALIZE DEPT DB (INCLUDES DIRECTOR ADMIN DEFAULT CREDS)
         if (!localStorage.getItem('dept_db')) {
             localStorage.setItem('dept_db', JSON.stringify({
                 'dir_scrutiny': { password: 'pass123', label: 'Directorate Gas Relief (Initial Scrutiny)' },
@@ -758,22 +784,26 @@
             if (!/^[0-9]{8}$/.test(bmhrc)) { alert("Enter 8 Digit Valid BMHRC Card No."); return; }
 
             const fileInput = document.getElementById('pDoc');
-            if (fileInput.files[0].size > 10 * 1024 * 1024) { alert("File exceeds 10 MB size limit."); return; }
+            if (fileInput.files[0].size > 5 * 1024 * 1024) { alert("File exceeds 5 MB size limit for database storage."); return; }
 
             if (document.getElementById('captchaInput').value.trim().toUpperCase() !== currentCaptcha) {
                 alert('Invalid CAPTCHA!'); generateCaptcha(); return;
             }
 
+            const base64Doc = await fileToBase64(fileInput.files[0]);
             const appNo = 'BGT-' + Math.floor(100000 + Math.random() * 900000);
             const submissionDate = new Date().toLocaleString();
-            activeFileBlobs[appNo + '_ORIGINAL'] = URL.createObjectURL(fileInput.files[0]);
 
             const newApp = {
                 appNo: appNo, 
                 receivedDate: submissionDate,
                 name: document.getElementById('pName').value, mobile: mobile,
                 aadhaar: "[Aadhaar Redacted]", bmhrc: bmhrc, ailment: document.getElementById('pAilment').value,
-                fileName: fileInput.files[0].name, newFileName: "", status: 'Initial Scrutiny Pending', currentStage: 'dir_scrutiny',
+                fileName: fileInput.files[0].name, 
+                fileBase64: base64Doc, // Persistent Storage
+                newFileName: "", 
+                newFileBase64: "",
+                status: 'Initial Scrutiny Pending', currentStage: 'dir_scrutiny',
                 objectionRaised: false, objectionRemarks: '', hasNewFile: false,
                 heldByOffice: '', 
                 isFinalObjectionStalled: false, 
@@ -781,7 +811,6 @@
                 history: [{ stage: 'Patient Submission', remarks: 'Online application submitted successfully.', date: submissionDate }]
             };
 
-            // Save Application to Firebase Cloud Firestore
             if (typeof window.saveAppToCloud === 'function') {
                 await window.saveAppToCloud(newApp);
             } else {
@@ -797,7 +826,6 @@
             isMobileVerified = false; generateCaptcha(); updateDashboard();
         }
 
-        // --- CRYPTO DIGITAL SIGNATURE MODULE FOR USERS ---
         function verifyAndApplyESign() {
             const pinField = document.getElementById('deptESignPin');
             const pinVal = pinField.value.trim();
@@ -822,7 +850,7 @@
             if (!selectedApplicationId) return;
             const fileField = document.getElementById('deptUploadFileField');
             if (!fileField.files.length) { alert("Please select an office order/PDF file to upload."); return; }
-            if (fileField.files[0].size > 10 * 1024 * 1024) { alert("File exceeds 10 MB limit."); return; }
+            if (fileField.files[0].size > 5 * 1024 * 1024) { alert("File exceeds 5 MB limit."); return; }
 
             const db = JSON.parse(localStorage.getItem('applications_db'));
             const app = db.find(a => a.appNo === selectedApplicationId);
@@ -831,14 +859,14 @@
             if (app) {
                 const docId = 'DEPT-' + Date.now();
                 const uploadedFileName = fileField.files[0].name;
-                
-                activeFileBlobs[selectedApplicationId + '_' + docId] = URL.createObjectURL(fileField.files[0]);
+                const base64File = await fileToBase64(fileField.files[0]);
                 
                 app.deptFiles.push({
                     id: docId,
                     byOffice: creds[window.loggedInDeptUser].label,
                     byOfficeKey: window.loggedInDeptUser, 
                     fileName: uploadedFileName,
+                    fileBase64: base64File,
                     date: new Date().toLocaleString()
                 });
 
@@ -860,7 +888,6 @@
             }
         }
 
-        // --- PUBLIC TRACKING GATEWAY (PT ONLY - DOWNLOAD STRICTLY REMOVED) ---
         function trackApplication() {
             const key = document.getElementById('searchKey').value.trim();
             if (!key) return;
@@ -927,28 +954,17 @@
                 </div>`;
         }
 
-        function openOfficialDeptPDF(appNo, fileId) {
-            const url = activeFileBlobs[appNo + '_' + fileId];
-            if (url) window.open(url, '_blank');
-            else alert("Document link error.");
-        }
-
-        function openUploadedPDFTarget(appNo, type) {
-            const url = activeFileBlobs[appNo + '_' + type];
-            if (url) window.open(url, '_blank');
-            else alert("Document stream pointer missing.");
-        }
-
         async function executePatientReupload(appNo) {
             const fileField = document.getElementById('reUploadFileField');
             if (!fileField.files.length) { alert("Please select a file."); return; }
-            if (fileField.files[0].size > 10 * 1024 * 1024) { alert("File size must be under 10 MB."); return; }
+            if (fileField.files[0].size > 5 * 1024 * 1024) { alert("File size must be under 5 MB."); return; }
 
             const db = JSON.parse(localStorage.getItem('applications_db'));
             const app = db.find(a => a.appNo === appNo);
             if (app) {
-                activeFileBlobs[appNo + '_NEW'] = URL.createObjectURL(fileField.files[0]);
+                const base64NewDoc = await fileToBase64(fileField.files[0]);
                 app.newFileName = fileField.files[0].name;
+                app.newFileBase64 = base64NewDoc;
                 app.hasNewFile = true;
                 app.objectionRaised = false; 
                 
@@ -967,7 +983,6 @@
             }
         }
 
-        // --- AUTHENTICATION HANDLER (FIXED FOR DIRECTOR ADMIN) ---
         function handleDeptLogin(e) {
             e.preventDefault();
             const u = document.getElementById('deptUser').value.trim();
@@ -993,7 +1008,6 @@
             } else { alert('Authentication Failed! Incorrect Password.'); }
         }
 
-        // --- DIRECTOR ADMIN DASHBOARD LOADER (WITH S.NO & RECEIVED DATE COLUMNS) ---
         window.loadDirectorDashboard = function() {
             const db = JSON.parse(localStorage.getItem('applications_db')) || [];
             const tbody = document.getElementById('directorLiveTableBody');
@@ -1030,7 +1044,6 @@
             });
         };
 
-        // --- DIRECTOR ADMIN AUDIT VIEWER CORE TRIGGER ---
         window.auditApplicationDirector = function(appNo) {
             selectedApplicationId = appNo;
             const db = JSON.parse(localStorage.getItem('applications_db'));
@@ -1057,7 +1070,7 @@
                     const d = document.createElement('div');
                     d.className = "flex justify-between items-center bg-gray-100 border p-1.5 rounded text-[11px] mt-1";
                     d.innerHTML = `<span>📎 ${f.fileName} (<strong class="text-blue-900">${f.byOfficeKey}</strong>)</span>
-                                   <button onclick="openOfficialDeptPDF('${app.appNo}', '${f.id}')" class="text-indigo-600 underline font-bold ml-2 cursor-pointer">Open View</button>`;
+                                   <button onclick="openBase64PDFTarget('${app.appNo}', '${f.id}')" class="text-indigo-600 underline font-bold ml-2 cursor-pointer">Open View</button>`;
                     internalContainer.appendChild(d);
                 });
             } else {
@@ -1162,7 +1175,7 @@
                                 </div>
                                 <div class="flex items-center justify-between bg-gray-50 border rounded px-2 py-1 mt-auto">
                                     <span class="text-[10px] font-mono text-gray-600 truncate mr-2" title="${f.fileName}">📎 ${f.fileName}</span>
-                                    <button type="button" onclick="openOfficialDeptPDF('${app.appNo}', '${f.id}')" class="bg-indigo-600 hover:bg-indigo-700 text-white font-bold px-2 py-1 rounded text-[10px] cursor-pointer shadow-sm shrink-0 transition">👁️ View File</button>
+                                    <button type="button" onclick="openBase64PDFTarget('${app.appNo}', '${f.id}')" class="bg-indigo-600 hover:bg-indigo-700 text-white font-bold px-2 py-1 rounded text-[10px] cursor-pointer shadow-sm shrink-0 transition">👁️ View File</button>
                                 </div>
                             </div>`;
                     });
@@ -1179,14 +1192,6 @@
                 });
                 historyContainer.innerHTML = histHtml;
             }
-        }
-
-        function openUploadedPDF(fileTargetType) {
-            if (!selectedApplicationId) return;
-            const targetBlobKey = selectedApplicationId + '_' + fileTargetType;
-            const fileUrl = activeFileBlobs[targetBlobKey];
-            if (fileUrl) window.open(fileUrl, '_blank');
-            else alert("File stream pointer missing in active memory stack.");
         }
 
         async function processCaseAction(decision) {
