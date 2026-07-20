@@ -136,7 +136,7 @@
                                 <input type="text" id="pName" required placeholder="Enter Patient / Gas Victim Full Name" class="w-full p-2 border rounded bg-white">
                             </div>
 
-                            <!-- 3. CLAIMANT RELATION WITH PATIENT (NEW MANDATORY FIELD) -->
+                            <!-- 3. CLAIMANT RELATION WITH PATIENT -->
                             <div>
                                 <label id="lblRelationWithPatient" class="block text-sm font-medium mb-1">Claimant's Relation with Patient (दावेदार का मरीज़ से संबंध) *</label>
                                 <select id="pClaimantRelation" required class="w-full p-2 border rounded bg-white text-sm font-medium">
@@ -306,18 +306,18 @@
                                 </label>
                             </div>
                         </div>
-                        <button type="submit" id="btnSubmitApp" class="w-full bg-green-700 hover:bg-green-600 text-white font-bold py-2 rounded transition cursor-pointer">Submit Application</button>
+                        <button type="submit" id="btnSubmitApp" class="w-full bg-green-700 hover:bg-green-600 text-white font-bold py-2.5 rounded transition cursor-pointer text-base shadow-md">Submit Application</button>
                     </form>
 
                     <!-- Success Message Box -->
-                    <div id="successBox" class="hidden-section mt-4 p-4 bg-emerald-100 border border-emerald-400 text-emerald-800 rounded">
-                        <p id="lblSuccessTitle" class="font-bold">✓ Application Submitted Successfully!</p>
-                        <p class="text-sm mt-1"><span id="lblAppNumberText">Your unique Application Number is:</span> <span id="resAppNo" class="font-mono font-bold text-lg text-blue-900"></span></p>
-                        <p id="lblSuccessNote" class="text-xs mt-1 text-gray-600">Kindly note this down to track your live status.</p>
+                    <div id="successBox" class="hidden-section mt-4 p-4 bg-emerald-100 border-2 border-emerald-500 text-emerald-900 rounded shadow-md">
+                        <p id="lblSuccessTitle" class="font-black text-base">✓ Application Submitted Successfully!</p>
+                        <p class="text-sm mt-1"><span id="lblAppNumberText">Your unique Application Number is:</span> <span id="resAppNo" class="font-mono font-black text-xl text-blue-900 bg-white px-2 py-0.5 rounded border border-blue-300"></span></p>
+                        <p id="lblSuccessNote" class="text-xs mt-1 text-gray-700 font-semibold">Kindly note this down to track your live status.</p>
                     </div>
                 </div>
 
-                <!-- Right Side Panel: Live News & Announcements WITH INCREASED FONT SIZE & FULL LENGTH HEIGHT -->
+                <!-- Right Side Panel: Live News & Announcements -->
                 <div class="lg:col-span-1 bg-white/95 p-5 rounded-lg shadow-md border border-amber-200 flex flex-col h-full min-h-[750px]">
                     <div class="border-b-2 border-amber-500 pb-2 mb-3 flex items-center justify-between">
                         <h3 class="font-bold text-blue-900 text-base uppercase tracking-wide flex items-center gap-2">
@@ -333,7 +333,6 @@
                     <div class="news-scroll-container">
                         <div class="news-scroll-content">
                             
-                            <!-- Notice 1 -->
                             <div class="p-3.5 bg-red-50 border-l-4 border-red-600 rounded shadow-xs shrink-0">
                                 <span class="bg-red-600 text-white text-xs font-bold px-2 py-0.5 rounded flash-text uppercase">IMPORTANT MANDATORY RULE</span>
                                 <p class="text-sm font-bold text-red-950 mt-1">Aadhaar Linked Mobile Mandatory</p>
@@ -343,7 +342,6 @@
                                 <span class="text-[10px] text-gray-500 font-mono block mt-1">July 2026</span>
                             </div>
 
-                            <!-- Notice 2 -->
                             <div class="p-3.5 bg-indigo-50 border-l-4 border-indigo-600 rounded shadow-xs shrink-0">
                                 <span class="bg-indigo-800 text-white text-xs font-bold px-2 py-0.5 rounded uppercase">CRITICAL GUIDELINE</span>
                                 <p class="text-sm font-bold text-indigo-950 mt-1">Father/Spouse Name Requirement</p>
@@ -353,7 +351,6 @@
                                 <span class="text-[10px] text-gray-500 font-mono block mt-1">July 2026</span>
                             </div>
 
-                            <!-- Notice 3 -->
                             <div class="p-3.5 bg-amber-50 border-l-4 border-amber-500 rounded shadow-xs shrink-0">
                                 <span class="bg-amber-600 text-white text-xs font-bold px-2 py-0.5 rounded uppercase">WARD NO & SAMAGRA ID</span>
                                 <p class="text-sm font-bold text-amber-950 mt-1">अंतिम आदेश वार्ड क्र. एवं समग्र आईडी अनिवार्य</p>
@@ -362,7 +359,6 @@
                                 </p>
                             </div>
 
-                            <!-- Notice 4 -->
                             <div class="p-3.5 bg-blue-50 border-l-4 border-blue-600 rounded shadow-xs shrink-0">
                                 <span class="bg-blue-800 text-white text-xs font-bold px-2 py-0.5 rounded uppercase">DOCUMENTATION</span>
                                 <p class="text-sm font-bold text-blue-950 mt-1">आवश्यक दस्तावेज़ों की सूची (Max 1000 KB each):</p>
@@ -376,7 +372,7 @@
                                 </ul>
                             </div>
 
-                            <!-- DUPLICATED LOOP ITEMS FOR CONTINUOUS SMOOTH SCROLL -->
+                            <!-- DUPLICATED LOOP ITEMS -->
                             <div class="p-3.5 bg-red-50 border-l-4 border-red-600 rounded shadow-xs shrink-0">
                                 <span class="bg-red-600 text-white text-xs font-bold px-2 py-0.5 rounded flash-text uppercase">IMPORTANT MANDATORY RULE</span>
                                 <p class="text-sm font-bold text-red-950 mt-1">Aadhaar Linked Mobile Mandatory</p>
@@ -1014,143 +1010,162 @@
             }, 800);
         }
 
+        // GUARANTEED PATIENT FORM SUBMISSION WITH SAFE ASYNC BASE64 CONVERSION
         async function handlePatientSubmit(e) {
             e.preventDefault();
-            const claimantName = document.getElementById('pClaimantName').value.trim();
-            if (claimantName === "") { alert("Please enter Claimant Full Name."); return; }
-
-            const claimantRelation = document.getElementById('pClaimantRelation').value;
-            if (claimantRelation === "") { alert("Please select Claimant's Relation with Patient."); return; }
-
-            const mobile = document.getElementById('pMobile').value.trim();
-            if (!/^[0-9]{10}$/.test(mobile)) { alert("Enter 10 Digit Valid Mobile No."); return; }
-            if (!isMobileCaptchaVerified) { alert('Please verify Mobile CAPTCHA code first.'); return; }
             
-            const rawAadhaar = document.getElementById('pAadhaar').value.trim();
-            if (!/^[0-9]{12}$/.test(rawAadhaar)) { alert("Enter 12 Digit Valid Aadhaar No."); return; }
-            
-            const fatherSpouse = document.getElementById('pFatherSpouse').value.trim();
-            if (fatherSpouse === "") { alert("Please enter Father / Spouse Name."); return; }
+            try {
+                const claimantName = document.getElementById('pClaimantName').value.trim();
+                if (claimantName === "") { alert("Please enter Claimant Full Name."); return; }
 
-            const familySamagra = document.getElementById('pFamilySamagra').value.trim();
-            const indSamagra = document.getElementById('pIndividualSamagra').value.trim();
-            if (familySamagra === "") { alert("Please enter Family Samagra ID."); return; }
-            if (indSamagra === "") { alert("Please enter Individual Member Samagra ID."); return; }
+                const claimantRelation = document.getElementById('pClaimantRelation').value;
+                if (claimantRelation === "") { alert("Please select Claimant's Relation with Patient."); return; }
 
-            const wardNo = document.getElementById('pWardNo').value;
-            if (wardNo === "") { alert("Please select Antim Aadesh Ward No. (1 to 50)."); return; }
+                const mobile = document.getElementById('pMobile').value.trim();
+                if (!/^[0-9]{10}$/.test(mobile)) { alert("Enter 10 Digit Valid Mobile No."); return; }
+                if (!isMobileCaptchaVerified) { alert('Please verify Mobile CAPTCHA code first.'); return; }
+                
+                const rawAadhaar = document.getElementById('pAadhaar').value.trim();
+                if (!/^[0-9]{12}$/.test(rawAadhaar)) { alert("Enter 12 Digit Valid Aadhaar No."); return; }
+                
+                const fatherSpouse = document.getElementById('pFatherSpouse').value.trim();
+                if (fatherSpouse === "") { alert("Please enter Father / Spouse Name."); return; }
 
-            const diseaseName = document.getElementById('pDiseaseName').value.trim();
-            if (diseaseName === "") { alert("Please enter Disease Name / Details."); return; }
+                const familySamagra = document.getElementById('pFamilySamagra').value.trim();
+                const indSamagra = document.getElementById('pIndividualSamagra').value.trim();
+                if (familySamagra === "") { alert("Please enter Family Samagra ID."); return; }
+                if (indSamagra === "") { alert("Please enter Individual Member Samagra ID."); return; }
 
-            const bmhrc = document.getElementById('pBmhrc').value.trim();
-            if (bmhrc !== "" && !/^[0-9]{8}$/.test(bmhrc)) { alert("Enter 8 Digit Valid BMHRC Card No."); return; }
+                const wardNo = document.getElementById('pWardNo').value;
+                if (wardNo === "") { alert("Please select Antim Aadesh Ward No. (1 to 50)."); return; }
 
-            const isDeceased = document.querySelector('input[name="isDeceased"]:checked').value === 'YES';
+                const diseaseName = document.getElementById('pDiseaseName').value.trim();
+                if (diseaseName === "") { alert("Please enter Disease Name / Details."); return; }
 
-            const docInputs = [
-                { id: 'pDocAadhaar', key: 'aadhaar', label: 'Aadhaar Card', req: true },
-                { id: 'pDocMedical', key: 'medical', label: 'Medical History / Diagnostic Reports', req: true },
-                { id: 'pDocAntimAadesh', key: 'antimAadesh', label: 'Antim Aadesh', req: true },
-                { id: 'pDocProRata', key: 'proRata', label: 'Pro Rata Document', req: true },
-                { id: 'pDocSupportive', key: 'supportive', label: 'Supportive Document', req: true }
-            ];
+                const bmhrc = document.getElementById('pBmhrc').value.trim();
+                if (bmhrc !== "" && !/^[0-9]{8}$/.test(bmhrc)) { alert("Enter 8 Digit Valid BMHRC Card No."); return; }
 
-            if (isDeceased) {
-                docInputs.push({ id: 'pDocDeath', key: 'deathCert', label: 'Death Certificate', req: false });
-            }
+                const isDeceased = document.querySelector('input[name="isDeceased"]:checked').value === 'YES';
 
-            const maxSize = 1000 * 1024; // 1000 KB
-            const ptUploadedDocsMap = {};
-
-            for (let docObj of docInputs) {
-                const inputEl = document.getElementById(docObj.id);
-                if (docObj.req && !inputEl.files.length) {
-                    alert(`Please upload ${docObj.label}.`);
-                    return;
+                if (document.getElementById('captchaInput').value.trim().toUpperCase() !== currentCaptcha) {
+                    alert('Invalid Security CAPTCHA!'); generateCaptcha(); return;
                 }
 
-                if (inputEl.files.length) {
-                    if (inputEl.files[0].size > maxSize) {
-                        alert(`File [${docObj.label}] exceeds 1000 KB limit. Please upload a file smaller than 1000 KB.`);
+                const docInputs = [
+                    { id: 'pDocAadhaar', key: 'aadhaar', label: 'Aadhaar Card', req: true },
+                    { id: 'pDocMedical', key: 'medical', label: 'Medical History / Diagnostic Reports', req: true },
+                    { id: 'pDocAntimAadesh', key: 'antimAadesh', label: 'Antim Aadesh', req: true },
+                    { id: 'pDocProRata', key: 'proRata', label: 'Pro Rata Document', req: true },
+                    { id: 'pDocSupportive', key: 'supportive', label: 'Supportive Document', req: true }
+                ];
+
+                if (isDeceased) {
+                    docInputs.push({ id: 'pDocDeath', key: 'deathCert', label: 'Death Certificate', req: false });
+                }
+
+                const maxSize = 1000 * 1024; // 1000 KB
+                const ptUploadedDocsMap = {};
+
+                for (let docObj of docInputs) {
+                    const inputEl = document.getElementById(docObj.id);
+                    if (docObj.req && (!inputEl || !inputEl.files.length)) {
+                        alert(`Please upload ${docObj.label}.`);
                         return;
                     }
-                    const b64 = await fileToBase64(inputEl.files[0]);
-                    ptUploadedDocsMap[docObj.key] = {
-                        title: docObj.label,
-                        fileName: inputEl.files[0].name,
-                        base64: b64
-                    };
+
+                    if (inputEl && inputEl.files.length) {
+                        if (inputEl.files[0].size > maxSize) {
+                            alert(`File [${docObj.label}] exceeds 1000 KB limit. Please upload a file smaller than 1000 KB.`);
+                            return;
+                        }
+                        try {
+                            const b64 = await fileToBase64(inputEl.files[0]);
+                            ptUploadedDocsMap[docObj.key] = {
+                                title: docObj.label,
+                                fileName: inputEl.files[0].name,
+                                base64: b64
+                            };
+                        } catch (err) {
+                            console.error("Base64 Error: ", err);
+                        }
+                    }
                 }
+
+                const appNo = 'BGT-' + Math.floor(100000 + Math.random() * 900000);
+                const submissionDate = new Date().toLocaleString();
+
+                const newApp = {
+                    appNo: appNo, 
+                    receivedDate: submissionDate,
+                    claimantName: claimantName,
+                    claimantRelation: claimantRelation,
+                    name: document.getElementById('pName').value.trim(), 
+                    fatherSpouse: fatherSpouse,
+                    familySamagra: familySamagra,
+                    indSamagra: indSamagra,
+                    wardNo: wardNo,
+                    diseaseName: diseaseName,
+                    mobile: mobile,
+                    aadhaar: "[Aadhaar Redacted]", 
+                    bmhrc: bmhrc || "N/A", 
+                    ailment: document.getElementById('pAilment').value,
+                    isDeceased: isDeceased,
+                    fileName: ptUploadedDocsMap.aadhaar ? ptUploadedDocsMap.aadhaar.fileName : 'doc.pdf', 
+                    fileBase64: ptUploadedDocsMap.aadhaar ? ptUploadedDocsMap.aadhaar.base64 : '',
+                    ptDocs: ptUploadedDocsMap,
+                    newFileName: "", 
+                    newFileBase64: "",
+                    status: 'Initial Scrutiny Pending', 
+                    currentStage: 'dir_scrutiny',
+                    objectionRaised: false, 
+                    objectionRemarks: '', 
+                    hasNewFile: false,
+                    heldByOffice: '', 
+                    isFinalObjectionStalled: false, 
+                    deptFiles: [],
+                    history: [{ stage: 'Patient Submission', remarks: 'Online application submitted successfully with documents.', date: submissionDate }]
+                };
+
+                // Save to Local Database
+                const db = JSON.parse(localStorage.getItem('applications_db')) || [];
+                db.push(newApp); 
+                localStorage.setItem('applications_db', JSON.stringify(db));
+
+                // Save directly to Firebase Cloud Realtime
+                if (typeof window.saveAppToCloud === 'function') {
+                    await window.saveAppToCloud(newApp);
+                }
+                
+                simulateSMSAlert(mobile, appNo, "APPLICATION SUBMITTED SUCCESSFULLY", "Your application has been registered for ex-gratia processing. Save your application number.");
+
+                document.getElementById('resAppNo').innerText = appNo;
+                document.getElementById('successBox').classList.remove('hidden-section');
+                document.getElementById('patientForm').reset();
+                toggleDeathCertUpload(false);
+                
+                ['msgAadhaar', 'msgMedical', 'msgAntimAadesh', 'msgProRata', 'msgSupportive', 'msgDeath'].forEach(id => {
+                    const el = document.getElementById(id);
+                    if(el) el.classList.add('hidden-section');
+                });
+
+                isMobileCaptchaVerified = false; 
+                generateMobileCaptcha();
+                document.getElementById('mobileCaptchaInput').value = '';
+                document.getElementById('mobileCaptchaInput').disabled = false;
+                document.getElementById('btnVerifyMobileCaptcha').disabled = false;
+                document.getElementById('btnVerifyMobileCaptcha').classList.remove('opacity-40');
+                document.getElementById('mobileCaptchaStatus').innerText = "Status: Unverified";
+                document.getElementById('mobileCaptchaStatus').className = "text-xs font-bold text-red-600 block sm:inline";
+
+                generateCaptcha(); 
+                updateDashboard();
+
+                window.scrollTo({ top: document.getElementById('successBox').offsetTop - 50, behavior: 'smooth' });
+
+            } catch (err) {
+                alert("Submission Error: " + err.message);
+                console.error("Form Submission Error:", err);
             }
-
-            if (document.getElementById('captchaInput').value.trim().toUpperCase() !== currentCaptcha) {
-                alert('Invalid Security CAPTCHA!'); generateCaptcha(); return;
-            }
-
-            const appNo = 'BGT-' + Math.floor(100000 + Math.random() * 900000);
-            const submissionDate = new Date().toLocaleString();
-
-            const newApp = {
-                appNo: appNo, 
-                receivedDate: submissionDate,
-                claimantName: claimantName,
-                claimantRelation: claimantRelation,
-                name: document.getElementById('pName').value, 
-                fatherSpouse: fatherSpouse,
-                familySamagra: familySamagra,
-                indSamagra: indSamagra,
-                wardNo: wardNo,
-                diseaseName: diseaseName,
-                mobile: mobile,
-                aadhaar: "[Aadhaar Redacted]", 
-                bmhrc: bmhrc || "N/A", 
-                ailment: document.getElementById('pAilment').value,
-                isDeceased: isDeceased,
-                fileName: ptUploadedDocsMap.aadhaar ? ptUploadedDocsMap.aadhaar.fileName : 'doc.pdf', 
-                fileBase64: ptUploadedDocsMap.aadhaar ? ptUploadedDocsMap.aadhaar.base64 : '',
-                ptDocs: ptUploadedDocsMap,
-                newFileName: "", 
-                newFileBase64: "",
-                status: 'Initial Scrutiny Pending', currentStage: 'dir_scrutiny',
-                objectionRaised: false, objectionRemarks: '', hasNewFile: false,
-                heldByOffice: '', 
-                isFinalObjectionStalled: false, 
-                deptFiles: [],
-                history: [{ stage: 'Patient Submission', remarks: 'Online application submitted successfully with documents.', date: submissionDate }]
-            };
-
-            const db = JSON.parse(localStorage.getItem('applications_db')) || [];
-            db.push(newApp); 
-            localStorage.setItem('applications_db', JSON.stringify(db));
-
-            if (typeof window.saveAppToCloud === 'function') {
-                await window.saveAppToCloud(newApp);
-            }
-            
-            simulateSMSAlert(mobile, appNo, "APPLICATION SUBMITTED SUCCESSFULLY", "Your application has been registered for ex-gratia processing. Save your application number.");
-
-            document.getElementById('resAppNo').innerText = appNo;
-            document.getElementById('successBox').classList.remove('hidden-section');
-            document.getElementById('patientForm').reset();
-            toggleDeathCertUpload(false);
-            
-            ['msgAadhaar', 'msgMedical', 'msgAntimAadesh', 'msgProRata', 'msgSupportive', 'msgDeath'].forEach(id => {
-                const el = document.getElementById(id);
-                if(el) el.classList.add('hidden-section');
-            });
-
-            isMobileCaptchaVerified = false; 
-            generateMobileCaptcha();
-            document.getElementById('mobileCaptchaInput').value = '';
-            document.getElementById('mobileCaptchaInput').disabled = false;
-            document.getElementById('btnVerifyMobileCaptcha').disabled = false;
-            document.getElementById('btnVerifyMobileCaptcha').classList.remove('opacity-40');
-            document.getElementById('mobileCaptchaStatus').innerText = "Status: Unverified";
-            document.getElementById('mobileCaptchaStatus').className = "text-xs font-bold text-red-600 block sm:inline";
-
-            generateCaptcha(); 
-            updateDashboard();
         }
 
         function verifyDeptCaptcha() {
@@ -1535,7 +1550,6 @@
                 document.getElementById('noCaseSelected').classList.add('hidden-section');
                 document.getElementById('caseViewerArea').classList.remove('hidden-section');
                 
-                // TOP PATIENT & CLAIMANT INFORMATION PANEL
                 document.getElementById('vClaimantName').innerText = app.claimantName || 'N/A';
                 document.getElementById('vName').innerText = app.name;
                 document.getElementById('vClaimantRelation').innerText = app.claimantRelation || 'N/A';
