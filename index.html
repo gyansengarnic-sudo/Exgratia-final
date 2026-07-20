@@ -64,7 +64,7 @@
             display: flex;
             flex-direction: column;
             gap: 12px;
-            animation: newsContinuousScroll 18s linear infinite;
+            animation: newsContinuousScroll 22s linear infinite;
         }
         .news-scroll-container:hover .news-scroll-content {
             animation-play-state: paused;
@@ -123,17 +123,27 @@
                     <h2 id="patientPortalHeading" class="text-2xl font-semibold border-b pb-2 mb-4 text-blue-900">1. Patient (Beneficiary) Submission Portal</h2>
                     <form id="patientForm" onsubmit="handlePatientSubmit(event)">
                         <div class="grid grid-cols-1 gap-4 mb-4">
+                            <!-- Full Name -->
                             <div>
                                 <label id="lblFullName" class="block text-sm font-medium mb-1">Full Name *</label>
                                 <input type="text" id="pName" required class="w-full p-2 border rounded bg-white">
                             </div>
+
+                            <!-- Father / Spouse Name (NEW MANDATORY FIELD) -->
+                            <div>
+                                <label id="lblFatherSpouseName" class="block text-sm font-medium mb-1">Father / Spouse Name (पिता/पति का नाम) *</label>
+                                <input type="text" id="pFatherSpouse" required placeholder="Enter Father or Spouse Name" class="w-full p-2 border rounded bg-white">
+                            </div>
                             
-                            <!-- Mobile Number with CAPTCHA Verification -->
+                            <!-- Mobile Number with CAPTCHA Verification & Aadhaar Flash Message -->
                             <div>
                                 <label id="lblMobileNumber" class="block text-sm font-medium mb-1">Mobile Number *</label>
-                                <input type="text" id="pMobile" maxlength="10" required placeholder="10-digit number" class="w-full p-2 border rounded bg-white mb-2">
+                                <input type="text" id="pMobile" maxlength="10" required placeholder="10-digit number" class="w-full p-2 border rounded bg-white">
+                                <span class="text-xs font-bold text-red-600 mt-1 block flash-text">
+                                    📢 Mobile Number must be Aadhaar linked only / मोबाइल नंबर आधार से लिंक होना अनिवार्य है।
+                                </span>
                                 
-                                <div class="bg-blue-50/70 p-3 rounded border border-blue-200 mt-1">
+                                <div class="bg-blue-50/70 p-3 rounded border border-blue-200 mt-2">
                                     <label class="block text-xs font-bold text-blue-900 uppercase mb-1">Mobile Verification CAPTCHA *</label>
                                     <div class="flex flex-col sm:flex-row gap-2 items-start sm:items-center">
                                         <div class="flex items-center gap-1">
@@ -174,7 +184,8 @@
                                     <span id="msgAadhaar" class="text-xs font-bold text-emerald-600 hidden-section mt-1 block">✓ File Uploaded Successfully</span>
                                 </div>
                                 <div>
-                                    <label class="block text-xs font-semibold mb-1">2. Medical History File (PDF Only) *</label>
+                                    <!-- UPDATED LABEL FOR DIAGNOSTIC REPORTS -->
+                                    <label class="block text-xs font-semibold mb-1">2. Medical History / Diagnostic Reports File (PDF Only) *</label>
                                     <input type="file" id="pDocMedical" accept=".pdf" required onchange="handleFileSelected(this, 'msgMedical')" class="w-full p-1.5 border rounded bg-white text-xs">
                                     <span id="msgMedical" class="text-xs font-bold text-emerald-600 hidden-section mt-1 block">✓ File Uploaded Successfully</span>
                                 </div>
@@ -193,14 +204,31 @@
                                     <input type="file" id="pDocSupportive" accept=".pdf" required onchange="handleFileSelected(this, 'msgSupportive')" class="w-full p-1.5 border rounded bg-white text-xs">
                                     <span id="msgSupportive" class="text-xs font-bold text-emerald-600 hidden-section mt-1 block">✓ File Uploaded Successfully</span>
                                 </div>
-                                <div>
-                                    <label class="block text-xs font-semibold mb-1">6. Death Certificate (PDF Only) *</label>
-                                    <input type="file" id="pDocDeath" accept=".pdf" required onchange="handleFileSelected(this, 'msgDeath')" class="w-full p-1.5 border rounded bg-white text-xs">
-                                    <span id="msgDeath" class="text-xs font-bold text-emerald-600 hidden-section mt-1 block">✓ File Uploaded Successfully</span>
+
+                                <!-- PATIENT DECEASED STATUS RADIO BUTTON LOGIC -->
+                                <div class="p-3 bg-amber-50 border border-amber-300 rounded mt-2">
+                                    <label class="block text-xs font-bold text-amber-950 mb-1">Is the Patient Deceased? / क्या मरीज़ की मृत्यु हो चुकी है? *</label>
+                                    <div class="flex gap-4 items-center mt-1">
+                                        <label class="inline-flex items-center text-xs cursor-pointer font-bold">
+                                            <input type="radio" name="isDeceased" value="YES" onchange="toggleDeathCertUpload(true)" class="form-radio text-blue-600">
+                                            <span class="ml-1 text-red-700">Yes (हाँ - मृत्यु हो चुकी है)</span>
+                                        </label>
+                                        <label class="inline-flex items-center text-xs cursor-pointer font-bold">
+                                            <input type="radio" name="isDeceased" value="NO" checked onchange="toggleDeathCertUpload(false)" class="form-radio text-blue-600">
+                                            <span class="ml-1 text-green-700">No (नहीं - जीवित हैं)</span>
+                                        </label>
+                                    </div>
+
+                                    <!-- DEATH CERTIFICATE UPLOAD (NOT MANDATORY, CONDITIONAL) -->
+                                    <div id="deathCertContainer" class="hidden-section mt-3 border-t border-amber-200 pt-2">
+                                        <label class="block text-xs font-semibold mb-1 text-gray-800">6. Death Certificate (PDF Only) [Optional]:</label>
+                                        <input type="file" id="pDocDeath" accept=".pdf" onchange="handleFileSelected(this, 'msgDeath')" class="w-full p-1.5 border rounded bg-white text-xs">
+                                        <span id="msgDeath" class="text-xs font-bold text-emerald-600 hidden-section mt-1 block">✓ File Uploaded Successfully</span>
+                                    </div>
                                 </div>
 
                                 <span id="lblFileRestrictionNote" class="block text-xs font-bold text-red-600 mt-1 leading-normal">
-                                    ⚠️ Maximum file size limit: 1000 KB for each PDF. All documents listed above are mandatory.
+                                    ⚠️ Maximum file size limit: 1000 KB for each PDF.
                                 </span>
                             </div>
                             
@@ -249,73 +277,62 @@
                     <!-- Auto Scroll Container -->
                     <div class="news-scroll-container">
                         <div class="news-scroll-content">
-                            <!-- Item 1: Required Docs List -->
+                            
+                            <!-- Mandatory Rules Flashed -->
                             <div class="p-3 bg-red-50 border-l-4 border-red-600 rounded shadow-xs shrink-0">
-                                <span class="bg-red-600 text-white text-[10px] font-bold px-1.5 py-0.5 rounded flash-text uppercase">MANDATORY DOCUMENTS LIST</span>
-                                <p class="text-xs font-bold text-red-950 mt-1">आवश्यक दस्तावेज़ों की सूची (Max 1000 KB each):</p>
-                                <ul class="text-[11px] text-gray-800 mt-1 space-y-1 list-disc pl-4 font-semibold">
-                                    <li>1. Aadhaar Card (आधार कार्ड)</li>
-                                    <li>2. Medical History File (मेडिकल हिस्ट्री)</li>
-                                    <li>3. Antim Aadesh (अंतिम आदेश)</li>
-                                    <li>4. Pro Rata Document (प्रो राटा)</li>
-                                    <li>5. Any Other Supportive Document (अन्य सहायक दस्तावेज़)</li>
-                                    <li>6. Death Certificate (मृत्यु प्रमाण पत्र)</li>
-                                </ul>
-                                <span class="text-[9px] text-gray-500 font-mono block mt-1">All files must be PDF & strictly within 1000 KB.</span>
-                            </div>
-
-                            <!-- Item 2 -->
-                            <div class="p-3 bg-amber-50 border-l-4 border-amber-500 rounded shadow-xs shrink-0">
-                                <span class="bg-amber-600 text-white text-[10px] font-bold px-1.5 py-0.5 rounded uppercase">GUIDELINES</span>
-                                <p class="text-xs font-bold text-amber-950 mt-1">PDF File Size Constraint</p>
-                                <p class="text-[11px] text-gray-700 mt-1 leading-relaxed">
-                                    कृपया आवेदन करने से पूर्व यह सुनिश्चित करें कि आपके प्रत्येक दस्तावेज़ का आकार अधिकतम 1000 KB (1 MB) तक ही हो।
+                                <span class="bg-red-600 text-white text-[10px] font-bold px-1.5 py-0.5 rounded flash-text uppercase">IMPORTANT MANDATORY RULE</span>
+                                <p class="text-xs font-bold text-red-950 mt-1">Aadhaar Linked Mobile Mandatory</p>
+                                <p class="text-[11px] text-gray-800 mt-1 leading-relaxed font-semibold">
+                                    Office of Welfare Commissioner, Gas Rahat Bhopal द्वारा आवेदक को आधार से लिंक मोबाइल नंबर देना अनिवार्य है।
                                 </p>
                                 <span class="text-[9px] text-gray-400 font-mono block mt-1">July 2026</span>
                             </div>
 
-                            <!-- Item 3 -->
+                            <div class="p-3 bg-indigo-50 border-l-4 border-indigo-600 rounded shadow-xs shrink-0">
+                                <span class="bg-indigo-800 text-white text-[10px] font-bold px-1.5 py-0.5 rounded uppercase">CRITICAL GUIDELINE</span>
+                                <p class="text-xs font-bold text-indigo-950 mt-1">Father/Spouse Name Requirement</p>
+                                <p class="text-[11px] text-gray-800 mt-1 leading-relaxed font-semibold">
+                                    मेडिकल जांच रिपोर्ट (Diagnostic Reports) में पिता/पति (Father/Spouse) का नाम अंकित होना अनिवार्य है।
+                                </p>
+                                <span class="text-[9px] text-gray-400 font-mono block mt-1">July 2026</span>
+                            </div>
+
+                            <div class="p-3 bg-amber-50 border-l-4 border-amber-500 rounded shadow-xs shrink-0">
+                                <span class="bg-amber-600 text-white text-[10px] font-bold px-1.5 py-0.5 rounded uppercase">DOCUMENTATION</span>
+                                <p class="text-xs font-bold text-amber-950 mt-1">आवश्यक दस्तावेज़ों की सूची (Max 1000 KB each):</p>
+                                <ul class="text-[11px] text-gray-800 mt-1 space-y-1 list-disc pl-4 font-semibold">
+                                    <li>1. Aadhaar Card (आधार कार्ड)</li>
+                                    <li>2. Medical History / Diagnostic Reports</li>
+                                    <li>3. Antim Aadesh (अंतिम आदेश)</li>
+                                    <li>4. Pro Rata Document (प्रो राटा)</li>
+                                    <li>5. Any Other Supportive Document</li>
+                                    <li>6. Death Certificate (यदि लागू हो)</li>
+                                </ul>
+                            </div>
+
                             <div class="p-3 bg-blue-50 border-l-4 border-blue-600 rounded shadow-xs shrink-0">
                                 <span class="bg-blue-800 text-white text-[10px] font-bold px-1.5 py-0.5 rounded uppercase">NOTICE</span>
                                 <p class="text-xs font-bold text-blue-950 mt-1">Helpline Support Active</p>
                                 <p class="text-[11px] text-gray-700 mt-1 leading-relaxed">
                                     किसी भी तकनीकी समस्या या स्टेटस संबंधी सहायता के लिए कार्यदिवस में सुबह 10:00 से शाम 5:30 बजे तक 0755-2746660 पर संपर्क करें।
                                 </p>
-                                <span class="text-[9px] text-gray-400 font-mono block mt-1">July 2026</span>
                             </div>
 
-                            <!-- Item 4 -->
-                            <div class="p-3 bg-emerald-50 border-l-4 border-emerald-600 rounded shadow-xs shrink-0">
-                                <span class="bg-emerald-700 text-white text-[10px] font-bold px-1.5 py-0.5 rounded uppercase">UPDATE</span>
-                                <p class="text-xs font-bold text-emerald-950 mt-1">Direct Bank Disbursement (DBT)</p>
-                                <p class="text-[11px] text-gray-700 mt-1 leading-relaxed">
-                                    अनुग्रह राशि की स्वीकृति के पश्चात राशि सीधे लाभार्थी के आधार-लिंक्ड बैंक खाते में स्थानांतरित (DBT) की जाएगी।
-                                </p>
-                                <span class="text-[9px] text-gray-400 font-mono block mt-1">July 2026</span>
-                            </div>
-
-                            <!-- DUPLICATED LOOP ITEMS -->
+                            <!-- DUPLICATED LOOP ITEMS FOR CONTINUOUS SMOOTH SCROLL -->
                             <div class="p-3 bg-red-50 border-l-4 border-red-600 rounded shadow-xs shrink-0">
-                                <span class="bg-red-600 text-white text-[10px] font-bold px-1.5 py-0.5 rounded flash-text uppercase">MANDATORY DOCUMENTS LIST</span>
-                                <p class="text-xs font-bold text-red-950 mt-1">आवश्यक दस्तावेज़ों की सूची (Max 1000 KB each):</p>
-                                <ul class="text-[11px] text-gray-800 mt-1 space-y-1 list-disc pl-4 font-semibold">
-                                    <li>1. Aadhaar Card (आधार कार्ड)</li>
-                                    <li>2. Medical History File (मेडिकल हिस्ट्री)</li>
-                                    <li>3. Antim Aadesh (अंतिम आदेश)</li>
-                                    <li>4. Pro Rata Document (प्रो राटा)</li>
-                                    <li>5. Any Other Supportive Document (अन्य सहायक दस्तावेज़)</li>
-                                    <li>6. Death Certificate (मृत्यु प्रमाण पत्र)</li>
-                                </ul>
-                                <span class="text-[9px] text-gray-500 font-mono block mt-1">All files must be PDF & strictly within 1000 KB.</span>
+                                <span class="bg-red-600 text-white text-[10px] font-bold px-1.5 py-0.5 rounded flash-text uppercase">IMPORTANT MANDATORY RULE</span>
+                                <p class="text-xs font-bold text-red-950 mt-1">Aadhaar Linked Mobile Mandatory</p>
+                                <p class="text-[11px] text-gray-800 mt-1 leading-relaxed font-semibold">
+                                    Office of Welfare Commissioner, Gas Rahat Bhopal द्वारा आवेदक को आधार से लिंक मोबाइल नंबर देना अनिवार्य है।
+                                </p>
                             </div>
 
-                            <div class="p-3 bg-amber-50 border-l-4 border-amber-500 rounded shadow-xs shrink-0">
-                                <span class="bg-amber-600 text-white text-[10px] font-bold px-1.5 py-0.5 rounded uppercase">GUIDELINES</span>
-                                <p class="text-xs font-bold text-amber-950 mt-1">PDF File Size Constraint</p>
-                                <p class="text-[11px] text-gray-700 mt-1 leading-relaxed">
-                                    कृपया आवेदन करने से पूर्व यह सुनिश्चित करें कि आपके प्रत्येक दस्तावेज़ का आकार अधिकतम 1000 KB (1 MB) तक ही हो।
+                            <div class="p-3 bg-indigo-50 border-l-4 border-indigo-600 rounded shadow-xs shrink-0">
+                                <span class="bg-indigo-800 text-white text-[10px] font-bold px-1.5 py-0.5 rounded uppercase">CRITICAL GUIDELINE</span>
+                                <p class="text-xs font-bold text-indigo-950 mt-1">Father/Spouse Name Requirement</p>
+                                <p class="text-[11px] text-gray-800 mt-1 leading-relaxed font-semibold">
+                                    मेडिकल जांच रिपोर्ट (Diagnostic Reports) में पिता/पति (Father/Spouse) का नाम अंकित होना अनिवार्य है।
                                 </p>
-                                <span class="text-[9px] text-gray-400 font-mono block mt-1">July 2026</span>
                             </div>
 
                         </div>
@@ -413,8 +430,9 @@
                                     <th class="p-3 border-r">Application ID</th>
                                     <th class="p-3 border-r">Received Date</th>
                                     <th class="p-3 border-r">Patient Name (PT)</th>
+                                    <th class="p-3 border-r">Father/Spouse</th>
                                     <th class="p-3 border-r">Mobile Number</th>
-                                    <th class="p-3 border-r">Diagnosis (Ailment)</th>
+                                    <th class="p-3 border-r">Diagnosis</th>
                                     <th class="p-3 border-r">Current Active Desk</th>
                                     <th class="p-3 border-r">Live Workflow Status</th>
                                     <th class="p-3 text-center">Action</th>
@@ -439,7 +457,7 @@
                         <div class="bg-white p-3 border border-gray-200 rounded shadow-xs">
                             <h5 class="text-xs font-bold text-gray-800 uppercase tracking-wide mb-2 border-b pb-1">All Patient Uploaded Files & Verification Links</h5>
                             <div id="dAuditPtFilesList" class="space-y-2 text-xs mb-3">
-                                <!-- Injected dynamically for all 6 PT uploaded files -->
+                                <!-- Injected dynamically for uploaded files -->
                             </div>
 
                             <div id="dAuditNewFileWrapper" class="p-2 bg-emerald-50 border border-emerald-200 rounded flex justify-between items-center hidden-section">
@@ -490,6 +508,7 @@
                         <div class="bg-blue-50 p-3 rounded border flex justify-between items-center shadow-sm">
                             <div>
                                 <p class="text-sm font-semibold"><span id="lblViewerApplicant">Applicant:</span> <span id="vName" class="text-blue-900 text-lg font-bold"></span></p>
+                                <p class="text-xs text-gray-700 mt-0.5 font-medium">Father/Spouse Name: <span id="vFatherSpouse" class="font-bold text-indigo-950"></span></p>
                                 <p class="text-xs text-gray-600 mt-1">App No: <span id="vAppNo" class="font-mono font-bold bg-white px-1 border rounded text-blue-900"></span> | Mobile: <span id="vMobile" class="font-mono"></span> | BMHRC: <span id="vBmhrc" class="font-mono font-bold"></span></p>
                             </div>
                             <div class="text-right">
@@ -504,10 +523,10 @@
                             </label>
                             
                             <div id="ptDocAccessGrid" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-2 mt-2">
-                                <!-- Injected dynamically for all 6 PT uploaded files -->
+                                <!-- Injected dynamically -->
                             </div>
 
-                            <!-- Re-uploaded file section if objection was raised -->
+                            <!-- Re-uploaded file section -->
                             <div id="vNewFileContainer" class="mt-3 bg-emerald-50 p-2 border border-emerald-300 rounded flex items-center justify-between hidden-section">
                                 <div>
                                     <span class="text-[10px] font-bold text-emerald-800 uppercase block">CORRECTED / RE-UPLOADED FILE:</span>
@@ -685,11 +704,11 @@
                 mainTitle: "EX GRATIA MONEY DISTRIBUTION PORTAL FOR BHOPAL GAS TRAGEDY VICTIMS",
                 navHome: "🏠 Home", navPatient: "Patient Portal", navTrack: "Track Status", navLogin: "Department Login",
                 patientPortalHeading: "1. Patient (Beneficiary) Submission Portal",
-                lblFullName: "Full Name *", lblMobileNumber: "Mobile Number *",
+                lblFullName: "Full Name *", lblFatherSpouseName: "Father / Spouse Name *", lblMobileNumber: "Mobile Number *",
                 lblAadhaarNumber: "Aadhaar Number *",
                 lblAilmentType: "Ailment Type *", optSelectAilment: "-- Select Diagnosis --", optKidney: "Kidney Ailment", optPulmonary: "Cancer / Pulmonary Ailment",
                 lblBmhrcCard: "BMHRC Card Number (8 Digit)",
-                lblFileRestrictionNote: "⚠️ Maximum file size limit: 1000 KB for each PDF. All documents listed above are mandatory.",
+                lblFileRestrictionNote: "⚠️ Maximum file size limit: 1000 KB for each PDF.",
                 lblCaptcha: "Security CAPTCHA:", btnRefreshCaptcha: "Refresh", captchaInput_placeholder: "Enter Captcha",
                 btnSubmitApp: "Submit Application", lblSuccessTitle: "✓ Application Submitted Successfully!",
                 lblAppNumberText: "Your unique Application Number is:", lblSuccessNote: "Kindly note this down to track your live status.",
@@ -711,11 +730,11 @@
                 mainTitle: "भोपाल गैस त्रासदी पीड़ितों के लिए अनुग्रह राशि वितरण पोर्टल",
                 navHome: "🏠 होम", navPatient: "मरीज़ पोर्टल (फ़ॉर्म)", navTrack: "स्थिति ट्रैक करें", navLogin: "विभागीय लॉगिन",
                 patientPortalHeading: "1. मरीज़ (लाभार्थी) आवेदन सबमिशन पोर्टल",
-                lblFullName: "पूरा नाम *", lblMobileNumber: "मोबाइल नंबर *",
+                lblFullName: "पूरा नाम *", lblFatherSpouseName: "पिता / पति का नाम *", lblMobileNumber: "मोबाइल नंबर *",
                 lblAadhaarNumber: "आधार संख्या *",
                 lblAilmentType: "बीमारी का प्रकार *", optSelectAilment: "-- बीमारी/निदान चुनें --", optKidney: "किडनी (गुर्दे) की बीमारी", optPulmonary: "कैंसर / फेफड़े (पल्मोनरी) की बीमारी",
                 lblBmhrcCard: "BMHRC कार्ड संख्या (8 डिजिट)",
-                lblFileRestrictionNote: "⚠️ अधिकतम फ़ाइल आकार: प्रत्येक PDF के लिए 1000 KB। ऊपर सूचीबद्ध सभी दस्तावेज़ अनिवार्य हैं।",
+                lblFileRestrictionNote: "⚠️ अधिकतम फ़ाइल आकार: प्रत्येक PDF के लिए 1000 KB।",
                 lblCaptcha: "सुरक्षा कैप्चा:", btnRefreshCaptcha: "रिफ्रेश", captchaInput_placeholder: "कैप्चा कोड भरें",
                 btnSubmitApp: "आवेदन जमा करें", lblSuccessTitle: "✓ आवेदन सफलतापूर्वक जमा हो गया है!",
                 lblAppNumberText: "आपका विशिष्ट आवेदन नंबर है:", lblSuccessNote: "कृपया लाइव स्थिति ट्रैक करने के लिए इसे नोट कर लें।",
@@ -735,7 +754,19 @@
             }
         };
 
-        // Function to display file upload confirmation message
+        // Function to toggle Death Certificate Upload visibility
+        function toggleDeathCertUpload(show) {
+            const container = document.getElementById('deathCertContainer');
+            if (show) {
+                container.classList.remove('hidden-section');
+            } else {
+                container.classList.add('hidden-section');
+                document.getElementById('pDocDeath').value = '';
+                document.getElementById('msgDeath').classList.add('hidden-section');
+            }
+        }
+
+        // Display file upload confirmation message
         function handleFileSelected(inputEl, msgElementId) {
             const msgSpan = document.getElementById(msgElementId);
             if (inputEl.files && inputEl.files.length > 0) {
@@ -791,6 +822,7 @@
             document.getElementById('pMobile').placeholder = currentLang === 'en' ? "10-digit number" : "10-अंकीय संख्या";
             document.getElementById('pAadhaar').placeholder = currentLang === 'en' ? "Enter Aadhaar" : "आधार नंबर दर्ज करें";
             document.getElementById('pBmhrc').placeholder = currentLang === 'en' ? "Enter 8-digit BMHRC card number (Optional)" : "8-अंकीय BMHRC कार्ड संख्या (ऐच्छिक)";
+            document.getElementById('pFatherSpouse').placeholder = currentLang === 'en' ? "Enter Father or Spouse Name" : "पिता या पति का नाम दर्ज करें";
             document.getElementById('captchaInput').placeholder = langData['captchaInput_placeholder'];
             document.getElementById('searchKey').placeholder = langData['searchKey_placeholder'];
             document.getElementById('deptPass').placeholder = langData['deptPass_placeholder'];
@@ -914,39 +946,51 @@
             if (!isMobileCaptchaVerified) { alert('Please verify Mobile CAPTCHA code first.'); return; }
             if (!/^[0-9]{12}$/.test(document.getElementById('pAadhaar').value.trim())) { alert("Enter 12 Digit Valid Aadhaar No."); return; }
             
+            const fatherSpouse = document.getElementById('pFatherSpouse').value.trim();
+            if (fatherSpouse === "") { alert("Please enter Father / Spouse Name."); return; }
+
             const bmhrc = document.getElementById('pBmhrc').value.trim();
             if (bmhrc !== "" && !/^[0-9]{8}$/.test(bmhrc)) { alert("Enter 8 Digit Valid BMHRC Card No."); return; }
 
-            // Validate all 6 Mandatory Files Size
+            // Radio Deceased check
+            const isDeceased = document.querySelector('input[name="isDeceased"]:checked').value === 'YES';
+
+            // Validate Mandatory Files Size
             const docInputs = [
-                { id: 'pDocAadhaar', key: 'aadhaar', label: 'Aadhaar Card' },
-                { id: 'pDocMedical', key: 'medical', label: 'Medical History' },
-                { id: 'pDocAntimAadesh', key: 'antimAadesh', label: 'Antim Aadesh' },
-                { id: 'pDocProRata', key: 'proRata', label: 'Pro Rata Document' },
-                { id: 'pDocSupportive', key: 'supportive', label: 'Supportive Document' },
-                { id: 'pDocDeath', key: 'deathCert', label: 'Death Certificate' }
+                { id: 'pDocAadhaar', key: 'aadhaar', label: 'Aadhaar Card', req: true },
+                { id: 'pDocMedical', key: 'medical', label: 'Medical History / Diagnostic Reports', req: true },
+                { id: 'pDocAntimAadesh', key: 'antimAadesh', label: 'Antim Aadesh', req: true },
+                { id: 'pDocProRata', key: 'proRata', label: 'Pro Rata Document', req: true },
+                { id: 'pDocSupportive', key: 'supportive', label: 'Supportive Document', req: true }
             ];
+
+            // If deceased is yes and file attached, include Death Cert
+            if (isDeceased) {
+                docInputs.push({ id: 'pDocDeath', key: 'deathCert', label: 'Death Certificate', req: false });
+            }
 
             const maxSize = 1000 * 1024; // 1000 KB
             const ptUploadedDocsMap = {};
 
             for (let docObj of docInputs) {
                 const inputEl = document.getElementById(docObj.id);
-                if (!inputEl.files.length) {
+                if (docObj.req && !inputEl.files.length) {
                     alert(`Please upload ${docObj.label}.`);
                     return;
                 }
-                if (inputEl.files[0].size > maxSize) {
-                    alert(`File [${docObj.label}] exceeds 1000 KB limit. Please upload a file smaller than 1000 KB.`);
-                    return;
-                }
 
-                const b64 = await fileToBase64(inputEl.files[0]);
-                ptUploadedDocsMap[docObj.key] = {
-                    title: docObj.label,
-                    fileName: inputEl.files[0].name,
-                    base64: b64
-                };
+                if (inputEl.files.length) {
+                    if (inputEl.files[0].size > maxSize) {
+                        alert(`File [${docObj.label}] exceeds 1000 KB limit. Please upload a file smaller than 1000 KB.`);
+                        return;
+                    }
+                    const b64 = await fileToBase64(inputEl.files[0]);
+                    ptUploadedDocsMap[docObj.key] = {
+                        title: docObj.label,
+                        fileName: inputEl.files[0].name,
+                        base64: b64
+                    };
+                }
             }
 
             if (document.getElementById('captchaInput').value.trim().toUpperCase() !== currentCaptcha) {
@@ -959,10 +1003,13 @@
             const newApp = {
                 appNo: appNo, 
                 receivedDate: submissionDate,
-                name: document.getElementById('pName').value, mobile: mobile,
+                name: document.getElementById('pName').value, 
+                fatherSpouse: fatherSpouse,
+                mobile: mobile,
                 aadhaar: "[Aadhaar Redacted]", bmhrc: bmhrc || "N/A", ailment: document.getElementById('pAilment').value,
-                fileName: ptUploadedDocsMap.aadhaar.fileName, 
-                fileBase64: ptUploadedDocsMap.aadhaar.base64,
+                isDeceased: isDeceased,
+                fileName: ptUploadedDocsMap.aadhaar ? ptUploadedDocsMap.aadhaar.fileName : 'doc.pdf', 
+                fileBase64: ptUploadedDocsMap.aadhaar ? ptUploadedDocsMap.aadhaar.base64 : '',
                 ptDocs: ptUploadedDocsMap,
                 newFileName: "", 
                 newFileBase64: "",
@@ -971,7 +1018,7 @@
                 heldByOffice: '', 
                 isFinalObjectionStalled: false, 
                 deptFiles: [],
-                history: [{ stage: 'Patient Submission', remarks: 'Online application submitted successfully with all 6 mandatory documents.', date: submissionDate }]
+                history: [{ stage: 'Patient Submission', remarks: 'Online application submitted successfully with documents.', date: submissionDate }]
             };
 
             // 1. Save locally
@@ -989,6 +1036,7 @@
             document.getElementById('resAppNo').innerText = appNo;
             document.getElementById('successBox').classList.remove('hidden-section');
             document.getElementById('patientForm').reset();
+            toggleDeathCertUpload(false);
             
             // Reset upload success tags
             ['msgAadhaar', 'msgMedical', 'msgAntimAadesh', 'msgProRata', 'msgSupportive', 'msgDeath'].forEach(id => {
@@ -1129,6 +1177,7 @@
             box.innerHTML = `
                 <div class="border-b pb-3 mb-3">
                     <h3 class="text-lg font-bold text-blue-900">${record.name} <span class="text-gray-500 font-mono text-sm">(${record.appNo})</span></h3>
+                    <p class="text-xs text-gray-600 font-bold">Father/Spouse: ${record.fatherSpouse || 'N/A'}</p>
                     <p class="text-sm mt-1">Application Received Date: <strong class="text-gray-700">${record.receivedDate || 'N/A'}</strong></p>
                     <p class="text-sm mt-1">Live Processing Department: <strong class="text-indigo-900">${currentActiveDeskName}</strong></p>
                     <p class="text-sm mt-1">Live Status: <span class="px-2 py-0.5 rounded text-xs font-bold shadow-xs ${record.objectionRaised ? 'bg-amber-100 text-amber-800 border border-amber-300' : 'bg-blue-100 text-blue-800 border border-blue-300'}">${record.status}</span></p>
@@ -1198,7 +1247,7 @@
             tbody.innerHTML = '';
 
             if (db.length === 0) {
-                tbody.innerHTML = `<tr><td colspan="9" class="p-4 text-center text-gray-400 italic">No patient records exist in global storage data pipelines.</td></tr>`;
+                tbody.innerHTML = `<tr><td colspan="10" class="p-4 text-center text-gray-400 italic">No patient records exist in global storage data pipelines.</td></tr>`;
                 return;
             }
 
@@ -1213,6 +1262,7 @@
                     <td class="p-3 border-r font-mono font-bold text-blue-900">${app.appNo}</td>
                     <td class="p-3 border-r font-mono text-gray-600">${recDate}</td>
                     <td class="p-3 border-r font-medium">${app.name}</td>
+                    <td class="p-3 border-r text-gray-700">${app.fatherSpouse || 'N/A'}</td>
                     <td class="p-3 border-r font-mono">${app.mobile}</td>
                     <td class="p-3 border-r">${app.ailment}</td>
                     <td class="p-3 border-r font-semibold text-indigo-950">${deskName}</td>
@@ -1319,7 +1369,7 @@
                 const card = document.createElement('div');
                 card.className = `p-3 mb-2 border rounded cursor-pointer text-left shadow-sm transition hover:shadow-md ${selectedApplicationId === app.appNo ? 'border-amber-500 bg-amber-50 shadow-md' : 'bg-white border-gray-200'} ${app.objectionRaised ? 'border-l-4 border-l-amber-500' : 'border-l-4 border-l-blue-600'}`;
                 card.onclick = () => selectCase(app.appNo);
-                card.innerHTML = `<p class="font-bold text-sm text-gray-800">${app.name}</p><div class="flex justify-between text-[11px] mt-1"><span class="text-gray-500 font-mono bg-gray-100 px-1 rounded">${app.appNo}</span><span class="font-semibold ${app.status.includes('Objection') ? 'text-emerald-600':'text-blue-700'}">${app.status.includes('Returned') ? 'RESOLVED (NEW FILE)' : app.ailment}</span></div>`;
+                card.innerHTML = `<p class="font-bold text-sm text-gray-800">${app.name}</p><p class="text-[11px] text-gray-500 font-medium">S/O-W/O: ${app.fatherSpouse || 'N/A'}</p><div class="flex justify-between text-[11px] mt-1"><span class="text-gray-500 font-mono bg-gray-100 px-1 rounded">${app.appNo}</span><span class="font-semibold ${app.status.includes('Objection') ? 'text-emerald-600':'text-blue-700'}">${app.status.includes('Returned') ? 'RESOLVED (NEW FILE)' : app.ailment}</span></div>`;
                 container.appendChild(card);
             });
         };
@@ -1332,6 +1382,7 @@
                 document.getElementById('noCaseSelected').classList.add('hidden-section');
                 document.getElementById('caseViewerArea').classList.remove('hidden-section');
                 document.getElementById('vName').innerText = app.name;
+                document.getElementById('vFatherSpouse').innerText = app.fatherSpouse || 'N/A';
                 document.getElementById('vAppNo').innerText = app.appNo;
                 document.getElementById('vMobile').innerText = app.mobile;
                 document.getElementById('vBmhrc').innerText = app.bmhrc || 'N/A';
