@@ -745,7 +745,7 @@
         const app = initializeApp(firebaseConfig);
         const db = getFirestore(app);
 
-        // Global Visitor Counter
+        // Fail-safe Global Visitor Counter (Self-healing document creation)
         window.initVisitorCounter = function() {
             const counterRef = doc(db, "site_stats", "counter");
             if (!sessionStorage.getItem('visited_session_counter')) {
@@ -759,11 +759,13 @@
                     const count = snapshot.data().totalVisits || 0;
                     const el = document.getElementById('visitorCountVal');
                     if (el) el.innerText = count.toString().padStart(6, '0');
+                } else {
+                    setDoc(counterRef, { totalVisits: 1 }, { merge: true });
                 }
             });
         };
 
-        // Save Main App + Split Sub-collections for Files to avoid 1MB limit
+        // Self-Healing Cloud Save Architecture (Creates Collections and Sub-collections automatically)
         window.saveAppToCloud = async function(appData, ptDocs) {
             try {
                 const mainData = { ...appData };
@@ -779,10 +781,10 @@
                 }
                 mainData.ptDocs = ptDocsMeta;
 
-                // Save Main Lightweight App Metadata (< 10 KB)
-                await setDoc(doc(db, "applications", appData.appNo), mainData);
+                // 1. Create/Set Main Application Document in Firestore
+                await setDoc(doc(db, "applications", appData.appNo), mainData, { merge: true });
 
-                // Save files into sub-collection documents individually (< 500 KB each)
+                // 2. Save Each PDF into Sub-collection Document independently (< 500 KB each)
                 if (ptDocs) {
                     for (let key in ptDocs) {
                         if (ptDocs[key] && ptDocs[key].url) {
@@ -790,7 +792,7 @@
                                 title: ptDocs[key].title,
                                 fileName: ptDocs[key].fileName,
                                 url: ptDocs[key].url
-                            });
+                            }, { merge: true });
                         }
                     }
                 }
@@ -804,7 +806,7 @@
 
         window.saveDocFileToSubcollection = async function(appNo, fileKey, fileData) {
             try {
-                await setDoc(doc(db, "applications", appNo, "files", fileKey), fileData);
+                await setDoc(doc(db, "applications", appNo, "files", fileKey), fileData, { merge: true });
                 return true;
             } catch (e) {
                 console.error("Error saving file to subcollection: ", e);
@@ -1036,7 +1038,7 @@
             }
         }
 
-        // Fetch & View PDF File from Database
+        // Fetch & View PDF File from Database Sub-collection
         async function viewPatientFile(appNo, docKey) {
             alert("Fetching document from cloud database...");
             let fileData = await window.fetchDocFileFromSubcollection(appNo, docKey);
