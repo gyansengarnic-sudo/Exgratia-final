@@ -128,7 +128,7 @@
                                 <input type="text" id="pName" required class="w-full p-2 border rounded bg-white">
                             </div>
                             
-                            <!-- Mobile Number with CAPTCHA Verification (Replaced OTP) -->
+                            <!-- Mobile Number with CAPTCHA Verification -->
                             <div>
                                 <label id="lblMobileNumber" class="block text-sm font-medium mb-1">Mobile Number *</label>
                                 <input type="text" id="pMobile" maxlength="10" required placeholder="10-digit number" class="w-full p-2 border rounded bg-white mb-2">
@@ -164,7 +164,7 @@
                                 <input type="text" id="pBmhrc" maxlength="8" placeholder="Enter 8-digit BMHRC card number (Optional)" class="w-full p-2 border rounded bg-white">
                             </div>
                             
-                            <!-- Mandatory Upload File Options (With File Uploaded Success Display & Strict 1000 KB Limit) -->
+                            <!-- Mandatory Upload File Options -->
                             <div class="border-t border-b py-3 my-2 space-y-3 bg-blue-50/50 p-3 rounded">
                                 <span class="block text-xs font-bold text-blue-900 uppercase">Mandatory Documents Upload (Maximum file size: 1000 KB per PDF) *</span>
                                 
@@ -249,8 +249,6 @@
                     <!-- Auto Scroll Container -->
                     <div class="news-scroll-container">
                         <div class="news-scroll-content">
-                            <!-- Duplicate items for seamless continuous auto-scroll loop -->
-                            
                             <!-- Item 1: Required Docs List -->
                             <div class="p-3 bg-red-50 border-l-4 border-red-600 rounded shadow-xs shrink-0">
                                 <span class="bg-red-600 text-white text-[10px] font-bold px-1.5 py-0.5 rounded flash-text uppercase">MANDATORY DOCUMENTS LIST</span>
@@ -296,7 +294,7 @@
                                 <span class="text-[9px] text-gray-400 font-mono block mt-1">July 2026</span>
                             </div>
 
-                            <!-- DUPLICATED LOOP ITEMS FOR CONTINUOUS INFINITE SMOOTH SCROLL -->
+                            <!-- DUPLICATED LOOP ITEMS -->
                             <div class="p-3 bg-red-50 border-l-4 border-red-600 rounded shadow-xs shrink-0">
                                 <span class="bg-red-600 text-white text-[10px] font-bold px-1.5 py-0.5 rounded flash-text uppercase">MANDATORY DOCUMENTS LIST</span>
                                 <p class="text-xs font-bold text-red-950 mt-1">आवश्यक दस्तावेज़ों की सूची (Max 1000 KB each):</p>
@@ -382,7 +380,7 @@
             </div>
             
             <div class="bg-white p-4 border rounded-b-lg shadow space-y-6">
-                <!-- LIVE ANALYTICS DASHBOARD (EXCLUSIVELY SHOWN FOR DIRECTOR ADMIN) -->
+                <!-- LIVE ANALYTICS DASHBOARD -->
                 <div>
                     <h3 class="font-bold text-gray-700 mb-2 text-sm uppercase tracking-wide">Live Portal Analytics Summary</h3>
                     <div class="grid grid-cols-2 md:grid-cols-4 gap-4 text-center">
@@ -499,7 +497,7 @@
                             </div>
                         </div>
 
-                        <!-- ALL PATIENT SUBMITTED DOCUMENTS VERIFICATION PANEL (ACCESSIBLE TO ALL DEPT USERS) -->
+                        <!-- ALL PATIENT SUBMITTED DOCUMENTS VERIFICATION PANEL -->
                         <div class="bg-gray-50 p-3 rounded border border-gray-300">
                             <label class="block text-xs font-bold text-gray-800 uppercase tracking-wide mb-2 border-b pb-1">
                                 1. Patient Uploaded Documents Verification Panel (आवेदक के सभी दस्तावेज़)
@@ -527,7 +525,7 @@
                             </div>
                         </div>
 
-                        <!-- WORKFLOW HISTORY & REMARKS (MASTER COMPILATION LOG) -->
+                        <!-- WORKFLOW HISTORY & REMARKS -->
                         <div class="bg-emerald-50/50 p-3 rounded border border-emerald-200 shadow-sm">
                             <label class="block text-xs font-bold text-emerald-900 uppercase tracking-wide mb-2 border-b border-emerald-200 pb-1">3. Workflow History & Remarks (कार्यवाही विवरण)</label>
                             <div id="actionHistoryLog" class="max-h-32 overflow-y-auto space-y-1 text-[11px] font-mono bg-white p-2 rounded border border-emerald-100">
@@ -545,7 +543,7 @@
                                 </div>
                             </div>
 
-                            <!-- DEPARTMENT CAPTCHA VERIFICATION INTERFACE (REPLACED E-SIGN) -->
+                            <!-- DEPARTMENT CAPTCHA VERIFICATION INTERFACE -->
                             <div class="mb-4 p-3 bg-amber-50 border border-amber-300 rounded shadow-xs">
                                 <label class="block text-[11px] font-bold text-amber-900 uppercase mb-1">B. Department Security CAPTCHA Verification *:</label>
                                 <div class="flex flex-col sm:flex-row gap-2 items-start sm:items-center">
@@ -643,16 +641,25 @@
             }
         };
 
-        // 3. Real-Time Live Listener
+        // 3. Real-Time Live Listener & Synchronization
         window.listenToCloudData = function() {
             onSnapshot(collection(db, "applications"), (snapshot) => {
-                const liveApps = [];
+                const cloudApps = [];
                 snapshot.forEach((doc) => {
-                    liveApps.push(doc.data());
+                    cloudApps.push(doc.data());
                 });
-                localStorage.setItem('applications_db', JSON.stringify(liveApps));
+
+                const localApps = JSON.parse(localStorage.getItem('applications_db')) || [];
                 
-                updateDashboard();
+                // Merge Cloud & Local storage to prevent data loss
+                const mergedMap = new Map();
+                localApps.forEach(item => mergedMap.set(item.appNo, item));
+                cloudApps.forEach(item => mergedMap.set(item.appNo, item));
+
+                const finalAppsList = Array.from(mergedMap.values());
+                localStorage.setItem('applications_db', JSON.stringify(finalAppsList));
+                
+                if (typeof window.updateDashboard === 'function') window.updateDashboard();
                 if (window.loggedInDeptUser === 'director_admin') {
                     if (typeof window.loadDirectorDashboard === 'function') window.loadDirectorDashboard();
                 } else if (window.loggedInDeptUser) {
@@ -750,7 +757,7 @@
             });
         }
 
-        // Global function to open Base64 PDFs in a new tab safely for Verification
+        // Global function to open Base64 PDFs in a new tab safely
         window.openBase64PDFTarget = function(appNo, fileKey) {
             const db = JSON.parse(localStorage.getItem('applications_db')) || [];
             const app = db.find(a => a.appNo === appNo);
@@ -762,7 +769,6 @@
             else if (app.ptDocs && app.ptDocs[fileKey]) {
                 base64Data = app.ptDocs[fileKey].base64;
             } else {
-                // If opening internal uploaded dept file
                 const deptFile = (app.deptFiles || []).find(f => f.id === fileKey);
                 if (deptFile) base64Data = deptFile.fileBase64;
             }
@@ -911,7 +917,7 @@
             const bmhrc = document.getElementById('pBmhrc').value.trim();
             if (bmhrc !== "" && !/^[0-9]{8}$/.test(bmhrc)) { alert("Enter 8 Digit Valid BMHRC Card No."); return; }
 
-            // Validate all 6 Mandatory Files Size (Strict 1000 KB)
+            // Validate all 6 Mandatory Files Size
             const docInputs = [
                 { id: 'pDocAadhaar', key: 'aadhaar', label: 'Aadhaar Card' },
                 { id: 'pDocMedical', key: 'medical', label: 'Medical History' },
@@ -935,7 +941,6 @@
                     return;
                 }
 
-                // Store Base64 and Name for all files
                 const b64 = await fileToBase64(inputEl.files[0]);
                 ptUploadedDocsMap[docObj.key] = {
                     title: docObj.label,
@@ -957,8 +962,8 @@
                 name: document.getElementById('pName').value, mobile: mobile,
                 aadhaar: "[Aadhaar Redacted]", bmhrc: bmhrc || "N/A", ailment: document.getElementById('pAilment').value,
                 fileName: ptUploadedDocsMap.aadhaar.fileName, 
-                fileBase64: ptUploadedDocsMap.aadhaar.base64, // Primary fallback
-                ptDocs: ptUploadedDocsMap, // Master Storage of all 6 files for Department access
+                fileBase64: ptUploadedDocsMap.aadhaar.base64,
+                ptDocs: ptUploadedDocsMap,
                 newFileName: "", 
                 newFileBase64: "",
                 status: 'Initial Scrutiny Pending', currentStage: 'dir_scrutiny',
@@ -966,15 +971,15 @@
                 heldByOffice: '', 
                 isFinalObjectionStalled: false, 
                 deptFiles: [],
-                history: [{ stage: 'Patient Submission', remarks: 'Online application submitted successfully with all 6 mandatory documents (under 1000 KB).', date: submissionDate }]
+                history: [{ stage: 'Patient Submission', remarks: 'Online application submitted successfully with all 6 mandatory documents.', date: submissionDate }]
             };
 
-            // Save to Local Database First for Guaranteed Immediate Retrieval
+            // 1. Save locally
             const db = JSON.parse(localStorage.getItem('applications_db')) || [];
             db.push(newApp); 
             localStorage.setItem('applications_db', JSON.stringify(db));
 
-            // Sync to Firebase Cloud
+            // 2. Save directly to Firebase Cloud Realtime
             if (typeof window.saveAppToCloud === 'function') {
                 await window.saveAppToCloud(newApp);
             }
@@ -1030,7 +1035,7 @@
             if (!fileField.files.length) { alert("Please select an office order/PDF file to upload."); return; }
             if (fileField.files[0].size > 1000 * 1024) { alert("File exceeds 1000 KB limit."); return; }
 
-            const db = JSON.parse(localStorage.getItem('applications_db'));
+            const db = JSON.parse(localStorage.getItem('applications_db')) || [];
             const app = db.find(a => a.appNo === selectedApplicationId);
             const creds = JSON.parse(localStorage.getItem('dept_db'));
 
@@ -1137,7 +1142,7 @@
             if (!fileField.files.length) { alert("Please select a file."); return; }
             if (fileField.files[0].size > 1000 * 1024) { alert("File size must be under 1000 KB."); return; }
 
-            const db = JSON.parse(localStorage.getItem('applications_db'));
+            const db = JSON.parse(localStorage.getItem('applications_db')) || [];
             const app = db.find(a => a.appNo === appNo);
             if (app) {
                 const base64NewDoc = await fileToBase64(fileField.files[0]);
@@ -1224,7 +1229,7 @@
 
         window.auditApplicationDirector = function(appNo) {
             selectedApplicationId = appNo;
-            const db = JSON.parse(localStorage.getItem('applications_db'));
+            const db = JSON.parse(localStorage.getItem('applications_db')) || [];
             const app = db.find(a => a.appNo === appNo);
             if (!app) return;
 
@@ -1232,7 +1237,6 @@
             viewer.classList.remove('hidden-section');
             document.getElementById('dAuditAppNo').innerText = app.appNo;
 
-            // Render all PT uploaded files in Director Audit Desk
             const ptFilesContainer = document.getElementById('dAuditPtFilesList');
             ptFilesContainer.innerHTML = '';
             
@@ -1343,7 +1347,6 @@
                 document.getElementById('captchaVerificationLabel').className = "text-xs font-bold text-red-600 block sm:inline";
                 document.getElementById('deptRemarks').value = '';
 
-                // Dynamically Render All Patient Uploaded Documents for Verification
                 const ptGrid = document.getElementById('ptDocAccessGrid');
                 ptGrid.innerHTML = '';
 
@@ -1360,7 +1363,6 @@
                         ptGrid.appendChild(card);
                     }
                 } else {
-                    // Fallback for single file
                     ptGrid.innerHTML = `
                         <div class="bg-white p-2 border border-blue-200 rounded text-center flex flex-col justify-between items-center shadow-xs">
                             <span class="text-[10px] font-bold text-blue-900 block mb-0.5">Primary Application File</span>
@@ -1425,7 +1427,7 @@
                 return;
             }
 
-            const db = JSON.parse(localStorage.getItem('applications_db'));
+            const db = JSON.parse(localStorage.getItem('applications_db')) || [];
             const app = db.find(a => a.appNo === selectedApplicationId);
             const creds = JSON.parse(localStorage.getItem('dept_db'));
 
