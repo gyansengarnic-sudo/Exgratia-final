@@ -18,7 +18,7 @@
             animation: flashEffect 2s infinite;
         }
 
-        /* Continuous Tiled Grid Background Setup (4 Images Per Row) */
+        /* Continuous Tiled Grid Background Setup */
         .page-tiled-bg {
             position: fixed;
             top: 0;
@@ -33,7 +33,7 @@
             opacity: 0.06;
         }
 
-        /* Department Name Background Scrolling Watermark */
+        /* Department Name Background Watermark */
         .dept-text-watermark {
             position: fixed;
             top: 50%;
@@ -50,13 +50,13 @@
             line-height: 1.2;
         }
 
-        /* News Panel Auto-Scroll Animation (Full Length Extended) */
+        /* News Panel Auto-Scroll Animation */
         @keyframes newsContinuousScroll {
             0% { transform: translateY(0); }
             100% { transform: translateY(-50%); }
         }
         .news-scroll-container {
-            height: 750px; /* Full Length Height */
+            height: 750px;
             overflow: hidden;
             position: relative;
         }
@@ -232,32 +232,56 @@
                             
                             <!-- Mandatory Upload File Options -->
                             <div class="border-t border-b py-3 my-2 space-y-3 bg-blue-50/50 p-3 rounded">
-                                <span class="block text-xs font-bold text-blue-900 uppercase">Mandatory Documents Upload (Stored Directly in Cloud Database) *</span>
+                                <span class="block text-xs font-bold text-blue-900 uppercase">Mandatory Documents Upload (Max 500 KB per PDF) *</span>
                                 
-                                <div>
+                                <!-- File Item 1 -->
+                                <div class="bg-white p-2 border rounded shadow-xs">
                                     <label class="block text-xs font-semibold mb-1">1. Aadhaar Card (PDF Only) *</label>
-                                    <input type="file" id="pDocAadhaar" accept=".pdf" required onchange="handleFileSelected(this, 'msgAadhaar')" class="w-full p-1.5 border rounded bg-white text-xs">
-                                    <span id="msgAadhaar" class="text-xs font-bold text-emerald-600 hidden-section mt-1 block">✓ File Selected</span>
+                                    <div class="flex flex-col sm:flex-row gap-2 items-center">
+                                        <input type="file" id="pDocAadhaar" accept=".pdf" required onchange="validateAndSelectFile(this, 'btnUploadAadhaar')" class="w-full text-xs p-1 border rounded bg-gray-50">
+                                        <button type="button" id="btnUploadAadhaar" disabled onclick="uploadIndividualDoc('pDocAadhaar', 'aadhaar', 'Aadhaar Card', this)" class="bg-blue-800 hover:bg-blue-700 text-white text-xs font-bold px-3 py-1.5 rounded cursor-pointer shrink-0 opacity-50">📤 Upload</button>
+                                    </div>
+                                    <span id="msgAadhaar" class="text-xs font-bold text-emerald-600 hidden-section mt-1 block"></span>
                                 </div>
-                                <div>
+
+                                <!-- File Item 2 -->
+                                <div class="bg-white p-2 border rounded shadow-xs">
                                     <label class="block text-xs font-semibold mb-1">2. Medical History / Diagnostic Reports File (PDF Only) *</label>
-                                    <input type="file" id="pDocMedical" accept=".pdf" required onchange="handleFileSelected(this, 'msgMedical')" class="w-full p-1.5 border rounded bg-white text-xs">
-                                    <span id="msgMedical" class="text-xs font-bold text-emerald-600 hidden-section mt-1 block">✓ File Selected</span>
+                                    <div class="flex flex-col sm:flex-row gap-2 items-center">
+                                        <input type="file" id="pDocMedical" accept=".pdf" required onchange="validateAndSelectFile(this, 'btnUploadMedical')" class="w-full text-xs p-1 border rounded bg-gray-50">
+                                        <button type="button" id="btnUploadMedical" disabled onclick="uploadIndividualDoc('pDocMedical', 'medical', 'Medical History', this)" class="bg-blue-800 hover:bg-blue-700 text-white text-xs font-bold px-3 py-1.5 rounded cursor-pointer shrink-0 opacity-50">📤 Upload</button>
+                                    </div>
+                                    <span id="msgMedical" class="text-xs font-bold text-emerald-600 hidden-section mt-1 block"></span>
                                 </div>
-                                <div>
+
+                                <!-- File Item 3 -->
+                                <div class="bg-white p-2 border rounded shadow-xs">
                                     <label class="block text-xs font-semibold mb-1">3. Antim Aadesh (PDF Only) *</label>
-                                    <input type="file" id="pDocAntimAadesh" accept=".pdf" required onchange="handleFileSelected(this, 'msgAntimAadesh')" class="w-full p-1.5 border rounded bg-white text-xs">
-                                    <span id="msgAntimAadesh" class="text-xs font-bold text-emerald-600 hidden-section mt-1 block">✓ File Selected</span>
+                                    <div class="flex flex-col sm:flex-row gap-2 items-center">
+                                        <input type="file" id="pDocAntimAadesh" accept=".pdf" required onchange="validateAndSelectFile(this, 'btnUploadAntim')" class="w-full text-xs p-1 border rounded bg-gray-50">
+                                        <button type="button" id="btnUploadAntim" disabled onclick="uploadIndividualDoc('pDocAntimAadesh', 'antimAadesh', 'Antim Aadesh', this)" class="bg-blue-800 hover:bg-blue-700 text-white text-xs font-bold px-3 py-1.5 rounded cursor-pointer shrink-0 opacity-50">📤 Upload</button>
+                                    </div>
+                                    <span id="msgAntimAadesh" class="text-xs font-bold text-emerald-600 hidden-section mt-1 block"></span>
                                 </div>
-                                <div>
+
+                                <!-- File Item 4 -->
+                                <div class="bg-white p-2 border rounded shadow-xs">
                                     <label class="block text-xs font-semibold mb-1">4. Pro Rata Document (PDF Only) *</label>
-                                    <input type="file" id="pDocProRata" accept=".pdf" required onchange="handleFileSelected(this, 'msgProRata')" class="w-full p-1.5 border rounded bg-white text-xs">
-                                    <span id="msgProRata" class="text-xs font-bold text-emerald-600 hidden-section mt-1 block">✓ File Selected</span>
+                                    <div class="flex flex-col sm:flex-row gap-2 items-center">
+                                        <input type="file" id="pDocProRata" accept=".pdf" required onchange="validateAndSelectFile(this, 'btnUploadProRata')" class="w-full text-xs p-1 border rounded bg-gray-50">
+                                        <button type="button" id="btnUploadProRata" disabled onclick="uploadIndividualDoc('pDocProRata', 'proRata', 'Pro Rata Document', this)" class="bg-blue-800 hover:bg-blue-700 text-white text-xs font-bold px-3 py-1.5 rounded cursor-pointer shrink-0 opacity-50">📤 Upload</button>
+                                    </div>
+                                    <span id="msgProRata" class="text-xs font-bold text-emerald-600 hidden-section mt-1 block"></span>
                                 </div>
-                                <div>
-                                    <label class="block text-xs font-semibold mb-1">5. Any Other Supportive Document (PDF Only) *</label>
-                                    <input type="file" id="pDocSupportive" accept=".pdf" required onchange="handleFileSelected(this, 'msgSupportive')" class="w-full p-1.5 border rounded bg-white text-xs">
-                                    <span id="msgSupportive" class="text-xs font-bold text-emerald-600 hidden-section mt-1 block">✓ File Selected</span>
+
+                                <!-- File Item 5 (Optional) -->
+                                <div class="bg-white p-2 border rounded shadow-xs">
+                                    <label class="block text-xs font-semibold mb-1">5. Any Other Supportive Document (PDF Only) <span class="text-gray-500 font-normal">[Optional / ऐच्छिक]</span></label>
+                                    <div class="flex flex-col sm:flex-row gap-2 items-center">
+                                        <input type="file" id="pDocSupportive" accept=".pdf" onchange="validateAndSelectFile(this, 'btnUploadSupportive')" class="w-full text-xs p-1 border rounded bg-gray-50">
+                                        <button type="button" id="btnUploadSupportive" disabled onclick="uploadIndividualDoc('pDocSupportive', 'supportive', 'Supportive Document', this)" class="bg-blue-800 hover:bg-blue-700 text-white text-xs font-bold px-3 py-1.5 rounded cursor-pointer shrink-0 opacity-50">📤 Upload</button>
+                                    </div>
+                                    <span id="msgSupportive" class="text-xs font-bold text-emerald-600 hidden-section mt-1 block"></span>
                                 </div>
 
                                 <!-- PATIENT DECEASED STATUS RADIO BUTTON LOGIC -->
@@ -277,13 +301,16 @@
                                     <!-- DEATH CERTIFICATE UPLOAD -->
                                     <div id="deathCertContainer" class="hidden-section mt-3 border-t border-amber-200 pt-2">
                                         <label class="block text-xs font-semibold mb-1 text-gray-800">6. Death Certificate (PDF Only) [Optional]:</label>
-                                        <input type="file" id="pDocDeath" accept=".pdf" onchange="handleFileSelected(this, 'msgDeath')" class="w-full p-1.5 border rounded bg-white text-xs">
-                                        <span id="msgDeath" class="text-xs font-bold text-emerald-600 hidden-section mt-1 block">✓ File Selected</span>
+                                        <div class="flex flex-col sm:flex-row gap-2 items-center">
+                                            <input type="file" id="pDocDeath" accept=".pdf" onchange="validateAndSelectFile(this, 'btnUploadDeath')" class="w-full text-xs p-1 border rounded bg-white">
+                                            <button type="button" id="btnUploadDeath" disabled onclick="uploadIndividualDoc('pDocDeath', 'deathCert', 'Death Certificate', this)" class="bg-blue-800 hover:bg-blue-700 text-white text-xs font-bold px-3 py-1.5 rounded cursor-pointer shrink-0 opacity-50">📤 Upload</button>
+                                        </div>
+                                        <span id="msgDeath" class="text-xs font-bold text-emerald-600 hidden-section mt-1 block"></span>
                                     </div>
                                 </div>
 
-                                <span id="lblFileRestrictionNote" class="block text-xs font-bold text-blue-900 mt-1 leading-normal">
-                                    ☁️ Files are saved directly to Firebase Database Cloud Storage. Accessible from any PC.
+                                <span id="lblFileRestrictionNote" class="block text-xs font-bold text-red-600 mt-1 leading-normal">
+                                    ⚠️ Maximum file size limit: 500 KB for each PDF.
                                 </span>
                             </div>
                             
@@ -309,7 +336,7 @@
                         <button type="submit" id="btnSubmitApp" class="w-full bg-green-700 hover:bg-green-600 text-white font-bold py-2.5 rounded transition cursor-pointer text-base shadow-md">Submit Application</button>
                     </form>
 
-                    <!-- Success Message Box with Big Flashing Application Number -->
+                    <!-- Success Message Box -->
                     <div id="successBox" class="hidden-section mt-4 p-5 bg-emerald-100 border-2 border-emerald-500 text-emerald-950 rounded shadow-lg text-center">
                         <p id="lblSuccessTitle" class="font-black text-xl text-emerald-900">✓ Application Submitted Successfully!</p>
                         <p class="text-sm font-bold mt-2 text-gray-800"><span id="lblAppNumberText">Your unique Application Number is:</span></p>
@@ -320,7 +347,7 @@
                     </div>
                 </div>
 
-                <!-- Right Side Panel: Live News & Announcements (RESTORED TO ORIGINAL FORMAT) -->
+                <!-- Right Side Panel: Live News & Announcements -->
                 <div class="lg:col-span-1 bg-white/95 p-5 rounded-lg shadow-md border border-amber-200 flex flex-col h-full min-h-[750px]">
                     <div class="border-b-2 border-amber-500 pb-2 mb-3 flex items-center justify-between">
                         <h3 class="font-bold text-blue-900 text-base uppercase tracking-wide flex items-center gap-2">
@@ -638,7 +665,7 @@
                         <!-- ACTION & UPLOAD PANEL -->
                         <div class="bg-white p-4 rounded border-2 border-blue-200 shadow-md">
                             <div class="mb-4 p-3 bg-blue-50 border border-blue-200 rounded">
-                                <label class="block text-[11px] font-bold text-blue-900 uppercase mb-1">A. Upload Office Order / Note (फ़ाइल संलग्न करें Cloud Storage):</label>
+                                <label class="block text-[11px] font-bold text-blue-900 uppercase mb-1">A. Upload Office Order / Note (फ़ाइल संलग्न करें Cloud Database):</label>
                                 <div class="flex flex-col sm:flex-row gap-2 items-start sm:items-center">
                                     <input type="file" id="deptUploadFileField" accept=".pdf" class="text-xs p-1.5 border border-blue-300 bg-white rounded flex-grow focus:outline-none">
                                     <button type="button" onclick="executeDepartmentUpload()" class="bg-blue-800 hover:bg-blue-700 text-white text-[11px] font-bold px-3 py-2 rounded cursor-pointer shrink-0 shadow-sm transition">📤 Upload & Save to Case</button>
@@ -700,11 +727,10 @@
         </div>
     </footer>
 
-    <!-- ================= FIREBASE REALTIME ENGINE & STORAGE MODULE ================= -->
+    <!-- ================= FIREBASE REALTIME ENGINE & CLOUD FIRESTORE DATA MODULE ================= -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
         import { getFirestore, collection, updateDoc, doc, onSnapshot, setDoc, increment } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
-        import { getStorage, ref, uploadBytes, getDownloadURL } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-storage.js";
 
         const firebaseConfig = {
           apiKey: "AIzaSyBV0-SzZ5L1c6Ubp4YW86ajPZQSPkvd2Kc",
@@ -718,16 +744,6 @@
 
         const app = initializeApp(firebaseConfig);
         const db = getFirestore(app);
-        const storage = getStorage(app);
-
-        // Upload Helper Function - Saves files to Firebase Storage Cloud and returns accessible URL
-        window.uploadFileToCloud = async function(file, folderPath) {
-            if (!file) return "";
-            const fileRef = ref(storage, `${folderPath}/${Date.now()}_${file.name}`);
-            const snapshot = await uploadBytes(fileRef, file);
-            const downloadUrl = await getDownloadURL(snapshot.ref);
-            return downloadUrl;
-        };
 
         // Realtime Global Visitor Counter via Database
         window.initVisitorCounter = function() {
@@ -803,6 +819,8 @@
         let currentDeptCaptcha = '';
         let currentMobileCaptcha = '';
         window.loggedInDeptUser = null;
+        window.uploadedTempDocs = {}; // Stores individual upload Base64 results
+
         if (!window.memoryAppsDb) window.memoryAppsDb = [];
 
         window.getAppsData = function() {
@@ -871,6 +889,91 @@
             }
         };
 
+        // File Size Validation strictly for 500 KB Limit
+        function validateAndSelectFile(inputEl, btnId) {
+            const btn = document.getElementById(btnId);
+            if (inputEl.files && inputEl.files.length > 0) {
+                const file = inputEl.files[0];
+                const maxSizeBytes = 500 * 1024; // 500 KB
+
+                if (file.size > maxSizeBytes) {
+                    alert("Error: File larger than 500 KB! Please choose a file smaller than 500 KB.");
+                    inputEl.value = "";
+                    if (btn) {
+                        btn.disabled = true;
+                        btn.classList.add('opacity-50');
+                    }
+                    return;
+                }
+
+                if (btn) {
+                    btn.disabled = false;
+                    btn.classList.remove('opacity-50');
+                }
+            } else {
+                if (btn) {
+                    btn.disabled = true;
+                    btn.classList.add('opacity-50');
+                }
+            }
+        }
+
+        // Helper: Convert File to Base64 (Reliable Data-URL Cloud Storage)
+        function fileToBase64(file) {
+            return new Promise((resolve, reject) => {
+                const reader = new FileReader();
+                reader.readAsDataURL(file);
+                reader.onload = () => resolve(reader.result);
+                reader.onerror = error => reject(error);
+            });
+        }
+
+        // Upload Individual Document One by One to Cloud Database
+        async function uploadIndividualDoc(fileInputId, docKey, docTitle, btnEl) {
+            const inputEl = document.getElementById(fileInputId);
+            if (!inputEl || !inputEl.files.length) {
+                alert("Please select a PDF file first.");
+                return;
+            }
+
+            const file = inputEl.files[0];
+            if (file.size > 500 * 1024) {
+                alert("Error: File larger than 500 KB!");
+                inputEl.value = "";
+                btnEl.disabled = true;
+                btnEl.classList.add('opacity-50');
+                return;
+            }
+
+            btnEl.disabled = true;
+            btnEl.innerHTML = "⌛ Uploading...";
+
+            try {
+                const base64Data = await fileToBase64(file);
+                window.uploadedTempDocs[docKey] = {
+                    title: docTitle,
+                    fileName: file.name,
+                    url: base64Data
+                };
+
+                btnEl.innerHTML = "✓ Uploaded";
+                btnEl.className = "bg-emerald-700 text-white text-xs font-bold px-3 py-1.5 rounded shrink-0 cursor-default";
+
+                // Show Success Msg
+                const msgId = fileInputId.replace('pDoc', 'msg');
+                const msgSpan = document.getElementById(msgId);
+                if (msgSpan) {
+                    msgSpan.innerText = `✓ Successfully Uploaded (${file.name})`;
+                    msgSpan.classList.remove('hidden-section');
+                }
+
+            } catch (err) {
+                alert("Upload failed: " + err.message);
+                btnEl.disabled = false;
+                btnEl.innerHTML = "📤 Upload";
+            }
+        }
+
         function toggleDeathCertUpload(show) {
             const container = document.getElementById('deathCertContainer');
             if (show) {
@@ -879,21 +982,10 @@
                 container.classList.add('hidden-section');
                 document.getElementById('pDocDeath').value = '';
                 document.getElementById('msgDeath').classList.add('hidden-section');
+                delete window.uploadedTempDocs['deathCert'];
             }
         }
 
-        function handleFileSelected(inputEl, msgElementId) {
-            const msgSpan = document.getElementById(msgElementId);
-            if (inputEl.files && inputEl.files.length > 0) {
-                const fileName = inputEl.files[0].name;
-                msgSpan.innerText = `✓ Selected (${fileName})`;
-                msgSpan.classList.remove('hidden-section');
-            } else {
-                msgSpan.classList.add('hidden-section');
-            }
-        }
-
-        // Global File Opener: Handles Direct Cloud URLs and Base64 Fallbacks
         window.openPDFTarget = function(fileUrlOrBase64) {
             if (!fileUrlOrBase64) {
                 alert("File content or link is missing.");
@@ -901,11 +993,9 @@
             }
             if (fileUrlOrBase64.startsWith("http://") || fileUrlOrBase64.startsWith("https://")) {
                 window.open(fileUrlOrBase64, "_blank");
-            } else if (fileUrlOrBase64.startsWith("data:application/pdf")) {
+            } else {
                 const pdfWindow = window.open("");
                 pdfWindow.document.write(`<iframe width='100%' height='100%' src='${fileUrlOrBase64}'></iframe>`);
-            } else {
-                window.open(fileUrlOrBase64, "_blank");
             }
         };
 
@@ -1030,7 +1120,7 @@
             }, 800);
         }
 
-        // SUBMIT PATIENT APPLICATION WITH FIREBASE CLOUD STORAGE UPLOADS
+        // SUBMIT PATIENT APPLICATION
         async function handlePatientSubmit(e) {
             e.preventDefault();
             const submitBtn = document.getElementById('btnSubmitApp');
@@ -1072,46 +1162,21 @@
                     alert('Invalid Security CAPTCHA!'); generateCaptcha(); return;
                 }
 
-                // Flash "In Progress" message on Submit Button & Disable
-                submitBtn.disabled = true;
-                submitBtn.innerHTML = "⌛ Uploading Files to Cloud Database. Please Wait...";
-                submitBtn.className = "w-full bg-amber-600 text-white font-bold py-3 rounded text-base shadow-md cursor-not-allowed animate-pulse";
-
-                const docInputs = [
-                    { id: 'pDocAadhaar', key: 'aadhaar', label: 'Aadhaar Card', req: true },
-                    { id: 'pDocMedical', key: 'medical', label: 'Medical History / Diagnostic Reports', req: true },
-                    { id: 'pDocAntimAadesh', key: 'antimAadesh', label: 'Antim Aadesh', req: true },
-                    { id: 'pDocProRata', key: 'proRata', label: 'Pro Rata Document', req: true },
-                    { id: 'pDocSupportive', key: 'supportive', label: 'Supportive Document', req: true }
-                ];
-
-                if (isDeceased) {
-                    docInputs.push({ id: 'pDocDeath', key: 'deathCert', label: 'Death Certificate', req: false });
+                // Check Mandatory Individual File Upload Status
+                const requiredDocKeys = ['aadhaar', 'medical', 'antimAadesh', 'proRata'];
+                for (let reqKey of requiredDocKeys) {
+                    if (!window.uploadedTempDocs[reqKey]) {
+                        alert(`Please select and click 'Upload' for all mandatory documents (Aadhaar, Medical, Antim Aadesh, Pro Rata).`);
+                        return;
+                    }
                 }
+
+                submitBtn.disabled = true;
+                submitBtn.innerHTML = "⌛ Registering Application in Database. Please Wait...";
+                submitBtn.className = "w-full bg-amber-600 text-white font-bold py-3 rounded text-base shadow-md cursor-not-allowed animate-pulse";
 
                 const appNo = 'BGT-' + Math.floor(100000 + Math.random() * 900000);
                 const submissionDate = new Date().toLocaleString();
-                const ptUploadedDocsMap = {};
-
-                // Upload documents to Firebase Storage
-                for (let docObj of docInputs) {
-                    const inputEl = document.getElementById(docObj.id);
-                    if (docObj.req && (!inputEl || !inputEl.files.length)) {
-                        alert(`Please upload ${docObj.label}.`);
-                        resetSubmitButton();
-                        return;
-                    }
-
-                    if (inputEl && inputEl.files.length) {
-                        const file = inputEl.files[0];
-                        const downloadUrl = await window.uploadFileToCloud(file, `applications/${appNo}`);
-                        ptUploadedDocsMap[docObj.key] = {
-                            title: docObj.label,
-                            fileName: file.name,
-                            url: downloadUrl
-                        };
-                    }
-                }
 
                 const newApp = {
                     appNo: appNo, 
@@ -1130,8 +1195,8 @@
                     ailment: document.getElementById('pAilment').value,
                     isDeceased: isDeceased,
                     isNewUnread: true,
-                    fileName: ptUploadedDocsMap.aadhaar ? ptUploadedDocsMap.aadhaar.fileName : 'doc.pdf', 
-                    ptDocs: ptUploadedDocsMap,
+                    fileName: window.uploadedTempDocs.aadhaar ? window.uploadedTempDocs.aadhaar.fileName : 'doc.pdf', 
+                    ptDocs: window.uploadedTempDocs,
                     newFileName: "", 
                     newFileUrl: "",
                     status: 'In Progress', 
@@ -1155,10 +1220,20 @@
                 document.getElementById('successBox').classList.remove('hidden-section');
                 document.getElementById('patientForm').reset();
                 toggleDeathCertUpload(false);
+                window.uploadedTempDocs = {}; // Clear Temp Uploads
                 
                 ['msgAadhaar', 'msgMedical', 'msgAntimAadesh', 'msgProRata', 'msgSupportive', 'msgDeath'].forEach(id => {
                     const el = document.getElementById(id);
                     if(el) el.classList.add('hidden-section');
+                });
+
+                ['btnUploadAadhaar', 'btnUploadMedical', 'btnUploadAntim', 'btnUploadProRata', 'btnUploadSupportive', 'btnUploadDeath'].forEach(id => {
+                    const btn = document.getElementById(id);
+                    if (btn) {
+                        btn.disabled = true;
+                        btn.innerHTML = "📤 Upload";
+                        btn.className = "bg-blue-800 hover:bg-blue-700 text-white text-xs font-bold px-3 py-1.5 rounded cursor-pointer shrink-0 opacity-50";
+                    }
                 });
 
                 isMobileCaptchaVerified = false; 
@@ -1216,6 +1291,7 @@
             if (!selectedApplicationId) return;
             const fileField = document.getElementById('deptUploadFileField');
             if (!fileField.files.length) { alert("Please select an office order/PDF file to upload."); return; }
+            if (fileField.files[0].size > 500 * 1024) { alert("Error: File larger than 500 KB!"); return; }
 
             const db = window.getAppsData();
             const app = db.find(a => a.appNo === selectedApplicationId);
@@ -1224,7 +1300,7 @@
             if (app) {
                 const docId = 'DEPT-' + Date.now();
                 const uploadedFile = fileField.files[0];
-                const fileUrl = await window.uploadFileToCloud(uploadedFile, `dept_orders/${app.appNo}`);
+                const fileUrl = await fileToBase64(uploadedFile);
                 
                 if (!app.deptFiles) app.deptFiles = [];
                 app.deptFiles.push({
@@ -1287,13 +1363,13 @@
                         <p class="text-xs italic bg-white p-2 border rounded font-mono my-1 font-bold text-red-900">${record.objectionRemarks}</p>
                         
                         <div class="mt-3 p-3 bg-white border border-gray-200 rounded text-gray-800">
-                            <label class="block text-xs font-bold uppercase mb-1">Re-upload Corrected/Missing Document (PDF Only):</label>
-                            <input type="file" id="reUploadFileField" accept=".pdf" class="w-full text-xs p-1.5 border border-gray-300 rounded mb-2 focus:outline-none">
+                            <label class="block text-xs font-bold uppercase mb-1">Re-upload Corrected/Missing Document (PDF Only, Max 500 KB):</label>
+                            <input type="file" id="reUploadFileField" accept=".pdf" onchange="validateAndSelectFile(this, 'btnSubmitReupload')" class="w-full text-xs p-1.5 border border-gray-300 rounded mb-2 focus:outline-none">
                             
                             <label class="block text-xs font-bold uppercase mb-1">Comment / Reply to Objection (अपना उत्तर / टिप्पणी दर्ज करें) *:</label>
                             <textarea id="reUploadCommentField" rows="2" placeholder="Enter your response / explanation here..." class="w-full p-2 border border-gray-300 rounded text-xs mb-2"></textarea>
 
-                            <button onclick="executePatientReupload('${record.appNo}')" class="w-full bg-blue-700 hover:bg-blue-600 text-white text-xs font-bold py-2 rounded cursor-pointer shadow transition">Submit Document & Comment</button>
+                            <button id="btnSubmitReupload" onclick="executePatientReupload('${record.appNo}')" class="w-full bg-blue-700 hover:bg-blue-600 text-white text-xs font-bold py-2 rounded cursor-pointer shadow transition">Submit Document & Comment</button>
                         </div>
                     </div>`;
             }
@@ -1321,6 +1397,8 @@
             const commentField = document.getElementById('reUploadCommentField');
 
             if (!fileField || !fileField.files.length) { alert("Please select a missing/corrected PDF file first."); return; }
+            if (fileField.files[0].size > 500 * 1024) { alert("Error: File larger than 500 KB!"); return; }
+
             const comment = commentField ? commentField.value.trim() : "";
             if (!comment) { alert("Please enter your comment / explanation response."); return; }
 
@@ -1328,7 +1406,7 @@
             const app = db.find(a => a.appNo === appNo);
             if (app) {
                 const uploadedFile = fileField.files[0];
-                const downloadUrl = await window.uploadFileToCloud(uploadedFile, `patient_reuploads/${appNo}`);
+                const downloadUrl = await fileToBase64(uploadedFile);
 
                 app.newFileName = uploadedFile.name;
                 app.newFileUrl = downloadUrl;
@@ -1700,7 +1778,7 @@
                 app.objectionRaised = true; 
                 app.objectionRemarks = remarks;
                 app.heldByOffice = window.loggedInDeptUser;
-                app.hasNewFile = false; // Reset so patient can re-upload again
+                app.hasNewFile = false; 
                 simulateSMSAlert(app.mobile, app.appNo, "APPLICATION STALLED / ON HOLD (आपत्ति दर्ज)", `Objection: ${remarks}`);
             } else {
                 app.objectionRaised = false;
