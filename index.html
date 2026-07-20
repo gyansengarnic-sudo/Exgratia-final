@@ -127,23 +127,26 @@
                                 <label id="lblFullName" class="block text-sm font-medium mb-1">Full Name *</label>
                                 <input type="text" id="pName" required class="w-full p-2 border rounded bg-white">
                             </div>
-                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                <div>
-                                    <label id="lblMobileNumber" class="block text-sm font-medium mb-1">Mobile Number *</label>
-                                    <div class="flex gap-2">
-                                        <input type="text" id="pMobile" maxlength="10" required placeholder="10-digit number" class="w-full p-2 border rounded bg-white">
-                                        <button type="button" id="otpBtn" onclick="sendOTP()" class="bg-blue-600 hover:bg-blue-700 text-white px-3 py-1 text-xs rounded font-bold cursor-pointer shrink-0">Send OTP</button>
+                            
+                            <!-- Mobile Number with CAPTCHA Verification (Replaced OTP) -->
+                            <div>
+                                <label id="lblMobileNumber" class="block text-sm font-medium mb-1">Mobile Number *</label>
+                                <input type="text" id="pMobile" maxlength="10" required placeholder="10-digit number" class="w-full p-2 border rounded bg-white mb-2">
+                                
+                                <div class="bg-blue-50/70 p-3 rounded border border-blue-200 mt-1">
+                                    <label class="block text-xs font-bold text-blue-900 uppercase mb-1">Mobile Verification CAPTCHA *</label>
+                                    <div class="flex flex-col sm:flex-row gap-2 items-start sm:items-center">
+                                        <div class="flex items-center gap-1">
+                                            <span id="mobileCaptchaCode" class="bg-zinc-800 text-yellow-400 font-mono font-bold px-3 py-1 rounded select-none line-through tracking-widest text-sm"></span>
+                                            <button type="button" onclick="generateMobileCaptcha()" class="text-[10px] text-blue-600 underline">Refresh</button>
+                                        </div>
+                                        <input type="text" id="mobileCaptchaInput" placeholder="Enter CAPTCHA" class="text-xs p-2 border border-blue-300 bg-white rounded max-w-xs focus:outline-none font-mono">
+                                        <button type="button" id="btnVerifyMobileCaptcha" onclick="verifyMobileCaptcha()" class="bg-blue-700 hover:bg-blue-800 text-white text-[11px] font-bold px-4 py-2 rounded cursor-pointer shadow-sm transition">✓ Verify Mobile CAPTCHA</button>
+                                        <span id="mobileCaptchaStatus" class="text-xs font-bold text-red-600 block sm:inline">Status: Unverified</span>
                                     </div>
-                                </div>
-                                <div id="otpInputContainer" class="hidden-section">
-                                    <label id="lblEnterOtp" class="block text-sm font-medium mb-1 text-blue-800">Enter OTP (Sent to mobile) *</label>
-                                    <div class="flex gap-2">
-                                        <input type="text" id="otpVal" required placeholder="Enter code" class="w-full p-2 border border-blue-400 rounded bg-white">
-                                        <button type="button" id="verifyOtpBtn" onclick="verifyOTP()" class="bg-green-600 hover:bg-green-700 text-white px-3 py-1 text-xs rounded font-bold cursor-pointer shrink-0">Verify</button>
-                                    </div>
-                                    <span id="otpStatus" class="text-xs font-semibold block mt-1"></span>
                                 </div>
                             </div>
+
                             <div>
                                 <label id="lblAadhaarNumber" class="block text-sm font-medium mb-1">Aadhaar Number *</label>
                                 <input type="password" id="pAadhaar" maxlength="12" required placeholder="Enter Aadhaar" class="w-full p-2 border rounded bg-white">
@@ -161,33 +164,39 @@
                                 <input type="text" id="pBmhrc" maxlength="8" placeholder="Enter 8-digit BMHRC card number (Optional)" class="w-full p-2 border rounded bg-white">
                             </div>
                             
-                            <!-- Mandatory Upload File Options (Strict 1000 KB Limit) -->
+                            <!-- Mandatory Upload File Options (With File Uploaded Success Display & Strict 1000 KB Limit) -->
                             <div class="border-t border-b py-3 my-2 space-y-3 bg-blue-50/50 p-3 rounded">
                                 <span class="block text-xs font-bold text-blue-900 uppercase">Mandatory Documents Upload (Maximum file size: 1000 KB per PDF) *</span>
                                 
                                 <div>
                                     <label class="block text-xs font-semibold mb-1">1. Aadhaar Card (PDF Only) *</label>
-                                    <input type="file" id="pDocAadhaar" accept=".pdf" required class="w-full p-1.5 border rounded bg-white text-xs">
+                                    <input type="file" id="pDocAadhaar" accept=".pdf" required onchange="handleFileSelected(this, 'msgAadhaar')" class="w-full p-1.5 border rounded bg-white text-xs">
+                                    <span id="msgAadhaar" class="text-xs font-bold text-emerald-600 hidden-section mt-1 block">✓ File Uploaded Successfully</span>
                                 </div>
                                 <div>
                                     <label class="block text-xs font-semibold mb-1">2. Medical History File (PDF Only) *</label>
-                                    <input type="file" id="pDocMedical" accept=".pdf" required class="w-full p-1.5 border rounded bg-white text-xs">
+                                    <input type="file" id="pDocMedical" accept=".pdf" required onchange="handleFileSelected(this, 'msgMedical')" class="w-full p-1.5 border rounded bg-white text-xs">
+                                    <span id="msgMedical" class="text-xs font-bold text-emerald-600 hidden-section mt-1 block">✓ File Uploaded Successfully</span>
                                 </div>
                                 <div>
                                     <label class="block text-xs font-semibold mb-1">3. Antim Aadesh (PDF Only) *</label>
-                                    <input type="file" id="pDocAntimAadesh" accept=".pdf" required class="w-full p-1.5 border rounded bg-white text-xs">
+                                    <input type="file" id="pDocAntimAadesh" accept=".pdf" required onchange="handleFileSelected(this, 'msgAntimAadesh')" class="w-full p-1.5 border rounded bg-white text-xs">
+                                    <span id="msgAntimAadesh" class="text-xs font-bold text-emerald-600 hidden-section mt-1 block">✓ File Uploaded Successfully</span>
                                 </div>
                                 <div>
                                     <label class="block text-xs font-semibold mb-1">4. Pro Rata Document (PDF Only) *</label>
-                                    <input type="file" id="pDocProRata" accept=".pdf" required class="w-full p-1.5 border rounded bg-white text-xs">
+                                    <input type="file" id="pDocProRata" accept=".pdf" required onchange="handleFileSelected(this, 'msgProRata')" class="w-full p-1.5 border rounded bg-white text-xs">
+                                    <span id="msgProRata" class="text-xs font-bold text-emerald-600 hidden-section mt-1 block">✓ File Uploaded Successfully</span>
                                 </div>
                                 <div>
                                     <label class="block text-xs font-semibold mb-1">5. Any Other Supportive Document (PDF Only) *</label>
-                                    <input type="file" id="pDocSupportive" accept=".pdf" required class="w-full p-1.5 border rounded bg-white text-xs">
+                                    <input type="file" id="pDocSupportive" accept=".pdf" required onchange="handleFileSelected(this, 'msgSupportive')" class="w-full p-1.5 border rounded bg-white text-xs">
+                                    <span id="msgSupportive" class="text-xs font-bold text-emerald-600 hidden-section mt-1 block">✓ File Uploaded Successfully</span>
                                 </div>
                                 <div>
                                     <label class="block text-xs font-semibold mb-1">6. Death Certificate (PDF Only) *</label>
-                                    <input type="file" id="pDocDeath" accept=".pdf" required class="w-full p-1.5 border rounded bg-white text-xs">
+                                    <input type="file" id="pDocDeath" accept=".pdf" required onchange="handleFileSelected(this, 'msgDeath')" class="w-full p-1.5 border rounded bg-white text-xs">
+                                    <span id="msgDeath" class="text-xs font-bold text-emerald-600 hidden-section mt-1 block">✓ File Uploaded Successfully</span>
                                 </div>
 
                                 <span id="lblFileRestrictionNote" class="block text-xs font-bold text-red-600 mt-1 leading-normal">
@@ -195,7 +204,7 @@
                                 </span>
                             </div>
                             
-                            <!-- Captcha Section -->
+                            <!-- Security Captcha Section -->
                             <div class="bg-gray-100 p-3 rounded flex items-center justify-between border">
                                 <div>
                                     <span id="lblCaptcha" class="text-sm font-semibold text-gray-600 tracking-wider mr-2">Security CAPTCHA:</span>
@@ -659,7 +668,9 @@
     <script>
         let currentLang = 'en';
         let isCurrentSessionDeptVerified = false;
+        let isMobileCaptchaVerified = false;
         let currentDeptCaptcha = '';
+        let currentMobileCaptcha = '';
         window.loggedInDeptUser = null;
 
         const translations = {
@@ -667,8 +678,8 @@
                 mainTitle: "EX GRATIA MONEY DISTRIBUTION PORTAL FOR BHOPAL GAS TRAGEDY VICTIMS",
                 navHome: "🏠 Home", navPatient: "Patient Portal", navTrack: "Track Status", navLogin: "Department Login",
                 patientPortalHeading: "1. Patient (Beneficiary) Submission Portal",
-                lblFullName: "Full Name *", lblMobileNumber: "Mobile Number *", otpBtn: "Send OTP",
-                lblEnterOtp: "Enter OTP (Sent to mobile) *", verifyOtpBtn: "Verify", lblAadhaarNumber: "Aadhaar Number *",
+                lblFullName: "Full Name *", lblMobileNumber: "Mobile Number *",
+                lblAadhaarNumber: "Aadhaar Number *",
                 lblAilmentType: "Ailment Type *", optSelectAilment: "-- Select Diagnosis --", optKidney: "Kidney Ailment", optPulmonary: "Cancer / Pulmonary Ailment",
                 lblBmhrcCard: "BMHRC Card Number (8 Digit)",
                 lblFileRestrictionNote: "⚠️ Maximum file size limit: 1000 KB for each PDF. All documents listed above are mandatory.",
@@ -693,8 +704,8 @@
                 mainTitle: "भोपाल गैस त्रासदी पीड़ितों के लिए अनुग्रह राशि वितरण पोर्टल",
                 navHome: "🏠 होम", navPatient: "मरीज़ पोर्टल (फ़ॉर्म)", navTrack: "स्थिति ट्रैक करें", navLogin: "विभागीय लॉगिन",
                 patientPortalHeading: "1. मरीज़ (लाभार्थी) आवेदन सबमिशन पोर्टल",
-                lblFullName: "पूरा नाम *", lblMobileNumber: "मोबाइल नंबर *", otpBtn: "ओटीपी भेजें",
-                lblEnterOtp: "ओटीपी दर्ज करें (मोबाइल पर भेजा गया) *", verifyOtpBtn: "सत्यापित करें", lblAadhaarNumber: "आधार संख्या *",
+                lblFullName: "पूरा नाम *", lblMobileNumber: "मोबाइल नंबर *",
+                lblAadhaarNumber: "आधार संख्या *",
                 lblAilmentType: "बीमारी का प्रकार *", optSelectAilment: "-- बीमारी/निदान चुनें --", optKidney: "किडनी (गुर्दे) की बीमारी", optPulmonary: "कैंसर / फेफड़े (पल्मोनरी) की बीमारी",
                 lblBmhrcCard: "BMHRC कार्ड संख्या (8 डिजिट)",
                 lblFileRestrictionNote: "⚠️ अधिकतम फ़ाइल आकार: प्रत्येक PDF के लिए 1000 KB। ऊपर सूचीबद्ध सभी दस्तावेज़ अनिवार्य हैं।",
@@ -716,6 +727,18 @@
                 lblVisitorText: "Total Visits / कुल आगंतुक:"
             }
         };
+
+        // Function to display file upload confirmation message
+        function handleFileSelected(inputEl, msgElementId) {
+            const msgSpan = document.getElementById(msgElementId);
+            if (inputEl.files && inputEl.files.length > 0) {
+                const fileName = inputEl.files[0].name;
+                msgSpan.innerText = `✓ File Uploaded Successfully (${fileName})`;
+                msgSpan.classList.remove('hidden-section');
+            } else {
+                msgSpan.classList.add('hidden-section');
+            }
+        }
 
         // Helper function to convert File to Base64 String
         function fileToBase64(file) {
@@ -780,7 +803,7 @@
         }
         if (!localStorage.getItem('applications_db')) localStorage.setItem('applications_db', JSON.stringify([]));
 
-        let currentCaptcha = '', selectedApplicationId = null, isMobileVerified = false, generatedOTP = null;
+        let currentCaptcha = '', selectedApplicationId = null;
 
         const deptDeskLabels = {
             'dir_scrutiny': 'Directorate Gas Relief (Initial Scrutiny)',
@@ -793,7 +816,7 @@
         };
 
         window.onload = function() {
-            generateCaptcha(); generateDeptCaptcha(); updateDashboard(); initVisitorCounter(); switchView('patient-portal'); changeLanguage();
+            generateCaptcha(); generateMobileCaptcha(); generateDeptCaptcha(); updateDashboard(); initVisitorCounter(); switchView('patient-portal'); changeLanguage();
         };
 
         function initVisitorCounter() {
@@ -815,6 +838,37 @@
             const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
             let code = ''; for (let i = 0; i < 5; i++) code += chars.charAt(Math.floor(Math.random() * chars.length));
             currentCaptcha = code; document.getElementById('captchaCode').innerText = code;
+        }
+
+        function generateMobileCaptcha() {
+            const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
+            let code = ''; for (let i = 0; i < 5; i++) code += chars.charAt(Math.floor(Math.random() * chars.length));
+            currentMobileCaptcha = code;
+            const el = document.getElementById('mobileCaptchaCode');
+            if (el) el.innerText = code;
+        }
+
+        function verifyMobileCaptcha() {
+            const mobile = document.getElementById('pMobile').value.trim();
+            if (!/^[0-9]{10}$/.test(mobile)) { alert("Enter 10 Digit Valid Mobile No. first."); return; }
+            
+            const inputVal = document.getElementById('mobileCaptchaInput').value.trim().toUpperCase();
+            const label = document.getElementById('mobileCaptchaStatus');
+
+            if (inputVal === "" || inputVal !== currentMobileCaptcha) {
+                alert("Security Error: Please enter valid Mobile Verification CAPTCHA code.");
+                isMobileCaptchaVerified = false;
+                generateMobileCaptcha();
+                return;
+            }
+
+            isMobileCaptchaVerified = true;
+            label.innerText = "✓ Mobile Verified / मोबाइल सत्यापित";
+            label.className = "text-xs font-bold text-emerald-600 block sm:inline";
+            document.getElementById('mobileCaptchaInput').disabled = true;
+            document.getElementById('btnVerifyMobileCaptcha').disabled = true;
+            document.getElementById('btnVerifyMobileCaptcha').classList.add('opacity-40');
+            alert("Success: Mobile CAPTCHA verified successfully!");
         }
 
         function generateDeptCaptcha() {
@@ -841,26 +895,6 @@
             }
         }
 
-        function sendOTP() {
-            const mobile = document.getElementById('pMobile').value.trim();
-            if (!/^[0-9]{10}$/.test(mobile)) { alert("Enter 10 Digit Valid Mobile No."); return; }
-            generatedOTP = Math.floor(1000 + Math.random() * 9000).toString();
-            document.getElementById('otpInputContainer').classList.remove('hidden-section');
-            document.getElementById('otpStatus').className = "text-xs font-semibold text-blue-600 block mt-1";
-            document.getElementById('otpStatus').innerText = `Demo OTP Code: ${generatedOTP}`;
-        }
-
-        function verifyOTP() {
-            if (document.getElementById('otpVal').value.trim() === generatedOTP) {
-                isMobileVerified = true;
-                document.getElementById('otpStatus').className = "text-xs font-semibold text-green-600 block mt-1";
-                document.getElementById('otpStatus').innerText = "✓ Verified.";
-            } else {
-                isMobileVerified = false;
-                document.getElementById('otpStatus').innerText = "❌ Incorrect OTP.";
-            }
-        }
-
         function simulateSMSAlert(mobileNumber, appNo, statusType, remarks) {
             setTimeout(() => {
                 alert(`📱 [REAL-TIME MOBILE SMS ALERT SENT TO: +91 ${mobileNumber}]\n--------------------------------------------------\nApplication No: ${appNo}\nStatus Notification: ${statusType}\nMessage/Remarks: ${remarks}\n--------------------------------------------------\nसंचालनालय आयुक्त गैस राहत एवं पुनर्वास विभाग, म.प्र.`);
@@ -871,7 +905,7 @@
             e.preventDefault();
             const mobile = document.getElementById('pMobile').value.trim();
             if (!/^[0-9]{10}$/.test(mobile)) { alert("Enter 10 Digit Valid Mobile No."); return; }
-            if (!isMobileVerified) { alert('Please verify mobile number first.'); return; }
+            if (!isMobileCaptchaVerified) { alert('Please verify Mobile CAPTCHA code first.'); return; }
             if (!/^[0-9]{12}$/.test(document.getElementById('pAadhaar').value.trim())) { alert("Enter 12 Digit Valid Aadhaar No."); return; }
             
             const bmhrc = document.getElementById('pBmhrc').value.trim();
@@ -911,7 +945,7 @@
             }
 
             if (document.getElementById('captchaInput').value.trim().toUpperCase() !== currentCaptcha) {
-                alert('Invalid CAPTCHA!'); generateCaptcha(); return;
+                alert('Invalid Security CAPTCHA!'); generateCaptcha(); return;
             }
 
             const appNo = 'BGT-' + Math.floor(100000 + Math.random() * 900000);
@@ -947,7 +981,23 @@
             document.getElementById('resAppNo').innerText = appNo;
             document.getElementById('successBox').classList.remove('hidden-section');
             document.getElementById('patientForm').reset();
-            isMobileVerified = false; generateCaptcha(); updateDashboard();
+            
+            // Reset upload success tags
+            ['msgAadhaar', 'msgMedical', 'msgAntimAadesh', 'msgProRata', 'msgSupportive', 'msgDeath'].forEach(id => {
+                const el = document.getElementById(id);
+                if(el) el.classList.add('hidden-section');
+            });
+
+            isMobileCaptchaVerified = false; 
+            generateMobileCaptcha();
+            document.getElementById('mobileCaptchaInput').value = '';
+            document.getElementById('mobileCaptchaInput').disabled = false;
+            document.getElementById('btnVerifyMobileCaptcha').disabled = false;
+            document.getElementById('btnVerifyMobileCaptcha').classList.remove('opacity-40');
+            document.getElementById('mobileCaptchaStatus').innerText = "Status: Unverified";
+            document.getElementById('mobileCaptchaStatus').className = "text-xs font-bold text-red-600 block sm:inline";
+
+            generateCaptcha(); updateDashboard();
         }
 
         function verifyDeptCaptcha() {
