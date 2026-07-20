@@ -741,14 +741,32 @@
                     cloudApps.push(doc.data());
                 });
 
-                const localApps = JSON.parse(localStorage.getItem('applications_db')) || [];
-                
-                const mergedMap = new Map();
-                localApps.forEach(item => mergedMap.set(item.appNo, item));
-                cloudApps.forEach(item => mergedMap.set(item.appNo, item));
+                window.memoryAppsDb = cloudApps;
 
-                const finalAppsList = Array.from(mergedMap.values());
-                localStorage.setItem('applications_db', JSON.stringify(finalAppsList));
+                // Safe syncing to Local Storage without quota crash
+                try {
+                    localStorage.setItem('applications_db', JSON.stringify(cloudApps));
+                } catch (e) {
+                    console.warn("LocalStorage Quota Exceeded. Caching lean version to LocalStorage.");
+                    try {
+                        const leanApps = cloudApps.map(a => {
+                            const c = { ...a };
+                            c.fileBase64 = "";
+                            c.newFileBase64 = "";
+                            if (c.ptDocs) {
+                                const ptLean = {};
+                                for (let k in c.ptDocs) {
+                                    ptLean[k] = { title: c.ptDocs[k].title, fileName: c.ptDocs[k].fileName, base64: "" };
+                                }
+                                c.ptDocs = ptLean;
+                            }
+                            return c;
+                        });
+                        localStorage.setItem('applications_db', JSON.stringify(leanApps));
+                    } catch (e2) {
+                        console.warn("LocalStorage full, using in-memory cloud state.");
+                    }
+                }
                 
                 if (typeof window.updateDashboard === 'function') window.updateDashboard();
                 if (window.loggedInDeptUser === 'director_admin') {
@@ -770,6 +788,14 @@
         let currentDeptCaptcha = '';
         let currentMobileCaptcha = '';
         window.loggedInDeptUser = null;
+        window.memoryAppsDb = [];
+
+        window.getAppsData = function() {
+            if (window.memoryAppsDb && window.memoryAppsDb.length > 0) {
+                return window.memoryAppsDb;
+            }
+            return JSON.parse(localStorage.getItem('applications_db')) || [];
+        };
 
         const translations = {
             en: {
@@ -860,7 +886,7 @@
         }
 
         window.openBase64PDFTarget = function(appNo, fileKey) {
-            const db = JSON.parse(localStorage.getItem('applications_db')) || [];
+            const db = window.getAppsData();
             const app = db.find(a => a.appNo === appNo);
             if (!app) { alert("Application record not found."); return; }
 
@@ -989,7 +1015,7 @@
         }
 
         function updateDashboard() {
-            const db = JSON.parse(localStorage.getItem('applications_db')) || [];
+            const db = window.getAppsData();
             const total = db.length;
             const accepted = db.filter(a => a.currentStage === 'completed_disbursed').length;
             const rejected = db.filter(a => a.currentStage === 'patient_portal_correction' || a.status.includes('Rejected')).length;
@@ -1010,7 +1036,7 @@
             }, 800);
         }
 
-        // GUARANTEED PATIENT FORM SUBMISSION WITH SAFE ASYNC BASE64 CONVERSION
+        // GUARANTEED PATIENT FORM SUBMISSION WITHOUT QUOTA EXCEEDED ERROR
         async function handlePatientSubmit(e) {
             e.preventDefault();
             
@@ -1086,7 +1112,7 @@
                                 base64: b64
                             };
                         } catch (err) {
-                            console.error("Base64 Error: ", err);
+                            console.error("Base64 conversion error: ", err);
                         }
                     }
                 }
@@ -1126,12 +1152,32 @@
                     history: [{ stage: 'Patient Submission', remarks: 'Online application submitted successfully with documents.', date: submissionDate }]
                 };
 
-                // Save to Local Database
-                const db = JSON.parse(localStorage.getItem('applications_db')) || [];
-                db.push(newApp); 
-                localStorage.setItem('applications_db', JSON.stringify(db));
+                // Add to In-memory state array
+                if (!window.memoryAppsDb) window.memoryAppsDb = [];
+                window.memoryAppsDb.push(newApp);
 
-                // Save directly to Firebase Cloud Realtime
+                // Safe Save to LocalStorage catching QuotaExceededError
+                try {
+                    const db = JSON.parse(localStorage.getItem('applications_db')) || [];
+                    db.push(newApp); 
+                    localStorage.setItem('applications_db', JSON.stringify(db));
+                } catch (quotaErr) {
+                    console.warn("LocalStorage quota full. Saving lean metadata version locally.");
+                    try {
+                        const leanApp = JSON.parse(JSON.stringify(newApp));
+                        leanApp.fileBase64 = "";
+                        if (leanApp.ptDocs) {
+                            for (let k in leanApp.ptDocs) leanApp.ptDocs[k].base64 = "";
+                        }
+                        const db = JSON.parse(localStorage.getItem('applications_db')) || [];
+                        db.push(leanApp);
+                        localStorage.setItem('applications_db', JSON.stringify(db));
+                    } catch (e2) {
+                        console.warn("LocalStorage completely full. Proceeding with Cloud DB execution.");
+                    }
+                }
+
+                // Primary Realtime Database Storage (Firebase)
                 if (typeof window.saveAppToCloud === 'function') {
                     await window.saveAppToCloud(newApp);
                 }
@@ -1194,7 +1240,7 @@
             if (!fileField.files.length) { alert("Please select an office order/PDF file to upload."); return; }
             if (fileField.files[0].size > 1000 * 1024) { alert("File exceeds 1000 KB limit."); return; }
 
-            const db = JSON.parse(localStorage.getItem('applications_db')) || [];
+            const db = window.getAppsData();
             const app = db.find(a => a.appNo === selectedApplicationId);
             const creds = JSON.parse(localStorage.getItem('dept_db'));
 
@@ -1218,7 +1264,9 @@
                     date: new Date().toLocaleString() 
                 });
 
-                localStorage.setItem('applications_db', JSON.stringify(db));
+                try {
+                    localStorage.setItem('applications_db', JSON.stringify(db));
+                } catch(e) {}
 
                 if (typeof window.updateAppInCloud === 'function') {
                     await window.updateAppInCloud(app.appNo, app);
@@ -1233,7 +1281,7 @@
         function trackApplication() {
             const key = document.getElementById('searchKey').value.trim();
             if (!key) return;
-            const db = JSON.parse(localStorage.getItem('applications_db')) || [];
+            const db = window.getAppsData();
             const record = db.find(a => a.appNo === key || a.mobile === key);
             const box = document.getElementById('statusResult');
             box.classList.remove('hidden-section');
@@ -1304,7 +1352,7 @@
             if (!fileField || !fileField.files.length) { alert("Please select a missing/corrected PDF file first."); return; }
             if (fileField.files[0].size > 1000 * 1024) { alert("File size must be under 1000 KB limit."); return; }
 
-            const db = JSON.parse(localStorage.getItem('applications_db')) || [];
+            const db = window.getAppsData();
             const app = db.find(a => a.appNo === appNo);
             if (app) {
                 const base64NewDoc = await fileToBase64(fileField.files[0]);
@@ -1324,7 +1372,9 @@
                     date: new Date().toLocaleString() 
                 });
                 
-                localStorage.setItem('applications_db', JSON.stringify(db));
+                try {
+                    localStorage.setItem('applications_db', JSON.stringify(db));
+                } catch(e) {}
 
                 if (typeof window.updateAppInCloud === 'function') {
                     await window.updateAppInCloud(app.appNo, app);
@@ -1364,7 +1414,7 @@
         }
 
         window.loadDirectorDashboard = function() {
-            const db = JSON.parse(localStorage.getItem('applications_db')) || [];
+            const db = window.getAppsData();
             const tbody = document.getElementById('directorLiveTableBody');
             if(!tbody) return;
             tbody.innerHTML = '';
@@ -1403,7 +1453,7 @@
 
         window.auditApplicationDirector = function(appNo) {
             selectedApplicationId = appNo;
-            const db = JSON.parse(localStorage.getItem('applications_db')) || [];
+            const db = window.getAppsData();
             const app = db.find(a => a.appNo === appNo);
             if (!app) return;
 
@@ -1480,7 +1530,7 @@
         }
 
         window.loadDeptQueue = function() {
-            const db = JSON.parse(localStorage.getItem('applications_db')) || [];
+            const db = window.getAppsData();
             const container = document.getElementById('caseQueueList'); 
             if(!container) return;
             container.innerHTML = '';
@@ -1544,7 +1594,7 @@
         function selectCase(appNo) {
             selectedApplicationId = appNo; 
             loadDeptQueue();
-            const db = JSON.parse(localStorage.getItem('applications_db')) || [];
+            const db = window.getAppsData();
             const app = db.find(a => a.appNo === appNo);
             if (app) {
                 document.getElementById('noCaseSelected').classList.add('hidden-section');
@@ -1654,7 +1704,7 @@
                 return;
             }
 
-            const db = JSON.parse(localStorage.getItem('applications_db')) || [];
+            const db = window.getAppsData();
             const app = db.find(a => a.appNo === selectedApplicationId);
             const creds = JSON.parse(localStorage.getItem('dept_db'));
 
@@ -1693,7 +1743,9 @@
 
             app.history.push({ stage: creds[window.loggedInDeptUser].label + ' [Captcha Verified]', remarks: `Decision: ${decision}. Note: ${remarks || 'Approved'}`, date: new Date().toLocaleString() });
             
-            localStorage.setItem('applications_db', JSON.stringify(db));
+            try {
+                localStorage.setItem('applications_db', JSON.stringify(db));
+            } catch(e) {}
 
             if (typeof window.updateAppInCloud === 'function') {
                 await window.updateAppInCloud(app.appNo, app);
