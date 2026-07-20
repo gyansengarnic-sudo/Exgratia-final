@@ -969,11 +969,14 @@
                 history: [{ stage: 'Patient Submission', remarks: 'Online application submitted successfully with all 6 mandatory documents (under 1000 KB).', date: submissionDate }]
             };
 
+            // Save to Local Database First for Guaranteed Immediate Retrieval
+            const db = JSON.parse(localStorage.getItem('applications_db')) || [];
+            db.push(newApp); 
+            localStorage.setItem('applications_db', JSON.stringify(db));
+
+            // Sync to Firebase Cloud
             if (typeof window.saveAppToCloud === 'function') {
                 await window.saveAppToCloud(newApp);
-            } else {
-                const db = JSON.parse(localStorage.getItem('applications_db'));
-                db.push(newApp); localStorage.setItem('applications_db', JSON.stringify(db));
             }
             
             simulateSMSAlert(mobile, appNo, "APPLICATION SUBMITTED SUCCESSFULLY", "Your application has been registered for ex-gratia processing. Save your application number.");
@@ -997,7 +1000,8 @@
             document.getElementById('mobileCaptchaStatus').innerText = "Status: Unverified";
             document.getElementById('mobileCaptchaStatus').className = "text-xs font-bold text-red-600 block sm:inline";
 
-            generateCaptcha(); updateDashboard();
+            generateCaptcha(); 
+            updateDashboard();
         }
 
         function verifyDeptCaptcha() {
@@ -1050,10 +1054,10 @@
                     date: new Date().toLocaleString() 
                 });
 
+                localStorage.setItem('applications_db', JSON.stringify(db));
+
                 if (typeof window.updateAppInCloud === 'function') {
                     await window.updateAppInCloud(app.appNo, app);
-                } else {
-                    localStorage.setItem('applications_db', JSON.stringify(db));
                 }
 
                 alert("Official Document/Order uploaded successfully!");
@@ -1065,7 +1069,7 @@
         function trackApplication() {
             const key = document.getElementById('searchKey').value.trim();
             if (!key) return;
-            const db = JSON.parse(localStorage.getItem('applications_db'));
+            const db = JSON.parse(localStorage.getItem('applications_db')) || [];
             const record = db.find(a => a.appNo === key || a.mobile === key);
             const box = document.getElementById('statusResult');
             box.classList.remove('hidden-section');
@@ -1146,10 +1150,10 @@
                 app.status = 'Objection Resolved - Returned to Review Desk';
                 app.history.push({ stage: 'Applicant Correction Upload', remarks: `Submitted requested document: ${app.newFileName}. File routed straight back to [${app.heldByOffice}] counter queue for secondary check.`, date: new Date().toLocaleString() });
                 
+                localStorage.setItem('applications_db', JSON.stringify(db));
+
                 if (typeof window.updateAppInCloud === 'function') {
                     await window.updateAppInCloud(app.appNo, app);
-                } else {
-                    localStorage.setItem('applications_db', JSON.stringify(db));
                 }
 
                 alert("Missing document uploaded successfully! Pushed straight back to the department desk that initiated the hold.");
@@ -1298,7 +1302,7 @@
         }
 
         window.loadDeptQueue = function() {
-            const db = JSON.parse(localStorage.getItem('applications_db'));
+            const db = JSON.parse(localStorage.getItem('applications_db')) || [];
             const container = document.getElementById('caseQueueList'); 
             if(!container) return;
             container.innerHTML = '';
@@ -1318,7 +1322,8 @@
 
         function selectCase(appNo) {
             selectedApplicationId = appNo; loadDeptQueue();
-            const app = JSON.parse(localStorage.getItem('applications_db')).find(a => a.appNo === appNo);
+            const db = JSON.parse(localStorage.getItem('applications_db')) || [];
+            const app = db.find(a => a.appNo === appNo);
             if (app) {
                 document.getElementById('noCaseSelected').classList.add('hidden-section');
                 document.getElementById('caseViewerArea').classList.remove('hidden-section');
@@ -1457,10 +1462,10 @@
 
             app.history.push({ stage: creds[window.loggedInDeptUser].label + ' [Captcha Verified]', remarks: `Decision: ${decision}. Note: ${remarks || 'Approved'}`, date: new Date().toLocaleString() });
             
+            localStorage.setItem('applications_db', JSON.stringify(db));
+
             if (typeof window.updateAppInCloud === 'function') {
                 await window.updateAppInCloud(app.appNo, app);
-            } else {
-                localStorage.setItem('applications_db', JSON.stringify(db));
             }
             
             alert(`Application processed successfully.`);
