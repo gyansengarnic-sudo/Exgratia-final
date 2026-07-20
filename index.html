@@ -158,7 +158,7 @@
                                 <input type="text" id="pFatherSpouse" required placeholder="Enter Father or Spouse Name" class="w-full p-2 border rounded bg-white">
                             </div>
 
-                            <!-- 5. MANDATORY SAMAGRA ID FIELDS (FAMILY & INDIVIDUAL) -->
+                            <!-- 5. MANDATORY SAMAGRA ID FIELDS -->
                             <div class="grid grid-cols-1 md:grid-cols-2 gap-4 bg-indigo-50/50 p-3 rounded border border-indigo-100">
                                 <div>
                                     <label class="block text-xs font-bold text-indigo-950 mb-1">Claimant Family Samagra ID (परिवार समग्र आईडी) *</label>
@@ -309,11 +309,14 @@
                         <button type="submit" id="btnSubmitApp" class="w-full bg-green-700 hover:bg-green-600 text-white font-bold py-2.5 rounded transition cursor-pointer text-base shadow-md">Submit Application</button>
                     </form>
 
-                    <!-- Success Message Box -->
-                    <div id="successBox" class="hidden-section mt-4 p-4 bg-emerald-100 border-2 border-emerald-500 text-emerald-900 rounded shadow-md">
-                        <p id="lblSuccessTitle" class="font-black text-base">✓ Application Submitted Successfully!</p>
-                        <p class="text-sm mt-1"><span id="lblAppNumberText">Your unique Application Number is:</span> <span id="resAppNo" class="font-mono font-black text-xl text-blue-900 bg-white px-2 py-0.5 rounded border border-blue-300"></span></p>
-                        <p id="lblSuccessNote" class="text-xs mt-1 text-gray-700 font-semibold">Kindly note this down to track your live status.</p>
+                    <!-- Success Message Box with Big Flashing Application Number -->
+                    <div id="successBox" class="hidden-section mt-4 p-5 bg-emerald-100 border-2 border-emerald-500 text-emerald-950 rounded shadow-lg text-center">
+                        <p id="lblSuccessTitle" class="font-black text-xl text-emerald-900">✓ Application Submitted Successfully!</p>
+                        <p class="text-sm font-bold mt-2 text-gray-800"><span id="lblAppNumberText">Your unique Application Number is:</span></p>
+                        <div class="my-3 inline-block">
+                            <span id="resAppNo" class="font-mono font-black text-3xl text-blue-900 bg-white px-4 py-1.5 rounded-lg border-2 border-blue-600 tracking-widest shadow-md flash-text block select-all"></span>
+                        </div>
+                        <p id="lblSuccessNote" class="text-xs font-bold text-red-700 uppercase tracking-wider block">📌 Kindly note down or screenshot this Application Number to track your live status.</p>
                     </div>
                 </div>
 
@@ -583,7 +586,7 @@
                                     🏥 Patient - Gas Victim Name: <span id="vName" class="text-blue-900 text-lg uppercase tracking-wide"></span>
                                 </p>
                                 <p class="text-xs text-gray-800 font-semibold">
-                                    👨‍👩‍👦 Father / Spouse: <span id="vFatherSpouse" class="text-indigo-950 font-bold"></span> | 🔗 Relation: <span id="vClaimantRelation" class="font-bold text-blue-900"></span> | 🏙️ Ward No: <span id="vWardNo" class="font-bold text-red-700 bg-white px-1 border rounded"></span>
+                                    👨‍gsub Father / Spouse: <span id="vFatherSpouse" class="text-indigo-950 font-bold"></span> | 🔗 Relation: <span id="vClaimantRelation" class="font-bold text-blue-900"></span> | 🏙️ Ward No: <span id="vWardNo" class="font-bold text-red-700 bg-white px-1 border rounded"></span>
                                 </p>
                                 <p class="text-xs text-red-900 font-bold">
                                     🦠 Disease Name: <span id="vDiseaseName" class="italic text-gray-800"></span>
@@ -713,13 +716,33 @@
         const app = initializeApp(firebaseConfig);
         const db = getFirestore(app);
 
+        // Fail-safe Cloud Saving Engine
         window.saveAppToCloud = async function(appData) {
             try {
                 await setDoc(doc(db, "applications", appData.appNo), appData);
                 return true;
             } catch (e) {
-                console.error("Error saving document to Firebase: ", e);
-                return false;
+                console.warn("Full payload cloud save failed, storing lean version to Firestore:", e);
+                try {
+                    const cloudAppLean = { ...appData };
+                    cloudAppLean.fileBase64 = "";
+                    if (cloudAppLean.ptDocs) {
+                        const ptLean = {};
+                        for (let k in cloudAppLean.ptDocs) {
+                            ptLean[k] = { 
+                                title: cloudAppLean.ptDocs[k].title, 
+                                fileName: cloudAppLean.ptDocs[k].fileName, 
+                                base64: "" 
+                            };
+                        }
+                        cloudAppLean.ptDocs = ptLean;
+                    }
+                    await setDoc(doc(db, "applications", appData.appNo), cloudAppLean);
+                    return true;
+                } catch(err2) {
+                    console.error("Firestore setDoc failed:", err2);
+                    return false;
+                }
             }
         };
 
@@ -734,6 +757,7 @@
             }
         };
 
+        // Real-Time Sync Engine with Non-destructive Memory Merging
         window.listenToCloudData = function() {
             onSnapshot(collection(db, "applications"), (snapshot) => {
                 const cloudApps = [];
@@ -741,31 +765,51 @@
                     cloudApps.push(doc.data());
                 });
 
-                window.memoryAppsDb = cloudApps;
+                if (!window.memoryAppsDb) window.memoryAppsDb = [];
 
-                // Safe syncing to Local Storage without quota crash
+                const mergedMap = new Map();
+                
+                // 1. Existing In-Memory Items
+                window.memoryAppsDb.forEach(item => { if(item && item.appNo) mergedMap.set(item.appNo, item); });
+                
+                // 2. LocalStorage Items
                 try {
-                    localStorage.setItem('applications_db', JSON.stringify(cloudApps));
-                } catch (e) {
-                    console.warn("LocalStorage Quota Exceeded. Caching lean version to LocalStorage.");
-                    try {
-                        const leanApps = cloudApps.map(a => {
-                            const c = { ...a };
-                            c.fileBase64 = "";
-                            c.newFileBase64 = "";
-                            if (c.ptDocs) {
-                                const ptLean = {};
-                                for (let k in c.ptDocs) {
-                                    ptLean[k] = { title: c.ptDocs[k].title, fileName: c.ptDocs[k].fileName, base64: "" };
-                                }
-                                c.ptDocs = ptLean;
+                    const localApps = JSON.parse(localStorage.getItem('applications_db')) || [];
+                    localApps.forEach(item => { if(item && item.appNo) mergedMap.set(item.appNo, item); });
+                } catch(e) {}
+                
+                // 3. Cloud Firestore Items (Merging cleanly)
+                cloudApps.forEach(item => {
+                    if (item && item.appNo) {
+                        const existing = mergedMap.get(item.appNo);
+                        if (existing) {
+                            // Retain local base64 documents if cloud metadata is lean
+                            const mergedItem = { ...item };
+                            if (existing.ptDocs && (!item.ptDocs || !item.ptDocs.aadhaar || !item.ptDocs.aadhaar.base64)) {
+                                mergedItem.ptDocs = existing.ptDocs;
+                                mergedItem.fileBase64 = existing.fileBase64;
                             }
+                            mergedMap.set(item.appNo, mergedItem);
+                        } else {
+                            mergedMap.set(item.appNo, item);
+                        }
+                    }
+                });
+
+                const finalAppsList = Array.from(mergedMap.values());
+                window.memoryAppsDb = finalAppsList;
+
+                // Safe Caching to LocalStorage
+                try {
+                    localStorage.setItem('applications_db', JSON.stringify(finalAppsList));
+                } catch (e) {
+                    try {
+                        const leanApps = finalAppsList.map(a => {
+                            const c = { ...a, fileBase64: "", newFileBase64: "" };
                             return c;
                         });
                         localStorage.setItem('applications_db', JSON.stringify(leanApps));
-                    } catch (e2) {
-                        console.warn("LocalStorage full, using in-memory cloud state.");
-                    }
+                    } catch (e2) {}
                 }
                 
                 if (typeof window.updateDashboard === 'function') window.updateDashboard();
@@ -788,13 +832,17 @@
         let currentDeptCaptcha = '';
         let currentMobileCaptcha = '';
         window.loggedInDeptUser = null;
-        window.memoryAppsDb = [];
+        if (!window.memoryAppsDb) window.memoryAppsDb = [];
 
         window.getAppsData = function() {
             if (window.memoryAppsDb && window.memoryAppsDb.length > 0) {
                 return window.memoryAppsDb;
             }
-            return JSON.parse(localStorage.getItem('applications_db')) || [];
+            try {
+                return JSON.parse(localStorage.getItem('applications_db')) || [];
+            } catch(e) {
+                return [];
+            }
         };
 
         const translations = {
@@ -900,11 +948,11 @@
                 if (deptFile) base64Data = deptFile.fileBase64;
             }
 
-            if (base64Data) {
+            if (base64Data && base64Data.startsWith("data:application/pdf")) {
                 const pdfWindow = window.open("");
                 pdfWindow.document.write(`<iframe width='100%' height='100%' src='${base64Data}'></iframe>`);
             } else {
-                alert("File content missing or corrupted.");
+                alert("File content missing or corrupted in browser memory cache.");
             }
         };
 
@@ -1018,7 +1066,7 @@
             const db = window.getAppsData();
             const total = db.length;
             const accepted = db.filter(a => a.currentStage === 'completed_disbursed').length;
-            const rejected = db.filter(a => a.currentStage === 'patient_portal_correction' || a.status.includes('Rejected')).length;
+            const rejected = db.filter(a => a.currentStage === 'patient_portal_correction' || (a.status && a.status.includes('Rejected'))).length;
             const inProcess = total - (accepted + rejected);
             
             const dashTotal = document.getElementById('dashTotal');
@@ -1036,9 +1084,10 @@
             }, 800);
         }
 
-        // GUARANTEED PATIENT FORM SUBMISSION WITHOUT QUOTA EXCEEDED ERROR
+        // SUBMIT PATIENT APPLICATION WITH "IN PROGRESS" LOADING & FLASHING APPLICATION NUMBER
         async function handlePatientSubmit(e) {
             e.preventDefault();
+            const submitBtn = document.getElementById('btnSubmitApp');
             
             try {
                 const claimantName = document.getElementById('pClaimantName').value.trim();
@@ -1077,6 +1126,11 @@
                     alert('Invalid Security CAPTCHA!'); generateCaptcha(); return;
                 }
 
+                // Flash "In Progress" message on Submit Button & Disable
+                submitBtn.disabled = true;
+                submitBtn.innerHTML = "⌛ Your Application In Progress. Please Wait...";
+                submitBtn.className = "w-full bg-amber-600 text-white font-bold py-3 rounded text-base shadow-md cursor-not-allowed animate-pulse";
+
                 const docInputs = [
                     { id: 'pDocAadhaar', key: 'aadhaar', label: 'Aadhaar Card', req: true },
                     { id: 'pDocMedical', key: 'medical', label: 'Medical History / Diagnostic Reports', req: true },
@@ -1089,19 +1143,21 @@
                     docInputs.push({ id: 'pDocDeath', key: 'deathCert', label: 'Death Certificate', req: false });
                 }
 
-                const maxSize = 1000 * 1024; // 1000 KB
+                const maxSize = 1000 * 1024; // 1000 KB limit
                 const ptUploadedDocsMap = {};
 
                 for (let docObj of docInputs) {
                     const inputEl = document.getElementById(docObj.id);
                     if (docObj.req && (!inputEl || !inputEl.files.length)) {
                         alert(`Please upload ${docObj.label}.`);
+                        resetSubmitButton();
                         return;
                     }
 
                     if (inputEl && inputEl.files.length) {
                         if (inputEl.files[0].size > maxSize) {
                             alert(`File [${docObj.label}] exceeds 1000 KB limit. Please upload a file smaller than 1000 KB.`);
+                            resetSubmitButton();
                             return;
                         }
                         try {
@@ -1136,6 +1192,7 @@
                     bmhrc: bmhrc || "N/A", 
                     ailment: document.getElementById('pAilment').value,
                     isDeceased: isDeceased,
+                    isNewUnread: true, // FLAG FOR "NEW" FLASHING TAG ON DEPT QUEUE
                     fileName: ptUploadedDocsMap.aadhaar ? ptUploadedDocsMap.aadhaar.fileName : 'doc.pdf', 
                     fileBase64: ptUploadedDocsMap.aadhaar ? ptUploadedDocsMap.aadhaar.base64 : '',
                     ptDocs: ptUploadedDocsMap,
@@ -1152,38 +1209,32 @@
                     history: [{ stage: 'Patient Submission', remarks: 'Online application submitted successfully with documents.', date: submissionDate }]
                 };
 
-                // Add to In-memory state array
+                // Add to In-memory state array immediately
                 if (!window.memoryAppsDb) window.memoryAppsDb = [];
                 window.memoryAppsDb.push(newApp);
 
-                // Safe Save to LocalStorage catching QuotaExceededError
+                // Safe Save to LocalStorage
                 try {
                     const db = JSON.parse(localStorage.getItem('applications_db')) || [];
                     db.push(newApp); 
                     localStorage.setItem('applications_db', JSON.stringify(db));
                 } catch (quotaErr) {
-                    console.warn("LocalStorage quota full. Saving lean metadata version locally.");
                     try {
-                        const leanApp = JSON.parse(JSON.stringify(newApp));
-                        leanApp.fileBase64 = "";
-                        if (leanApp.ptDocs) {
-                            for (let k in leanApp.ptDocs) leanApp.ptDocs[k].base64 = "";
-                        }
+                        const leanApp = { ...newApp, fileBase64: "" };
                         const db = JSON.parse(localStorage.getItem('applications_db')) || [];
                         db.push(leanApp);
                         localStorage.setItem('applications_db', JSON.stringify(db));
-                    } catch (e2) {
-                        console.warn("LocalStorage completely full. Proceeding with Cloud DB execution.");
-                    }
+                    } catch (e2) {}
                 }
 
-                // Primary Realtime Database Storage (Firebase)
+                // Push to Cloud Firestore
                 if (typeof window.saveAppToCloud === 'function') {
                     await window.saveAppToCloud(newApp);
                 }
                 
                 simulateSMSAlert(mobile, appNo, "APPLICATION SUBMITTED SUCCESSFULLY", "Your application has been registered for ex-gratia processing. Save your application number.");
 
+                // Flash Big Application Number on Screen
                 document.getElementById('resAppNo').innerText = appNo;
                 document.getElementById('successBox').classList.remove('hidden-section');
                 document.getElementById('patientForm').reset();
@@ -1205,12 +1256,24 @@
 
                 generateCaptcha(); 
                 updateDashboard();
+                resetSubmitButton();
 
+                // Scroll smoothly to Flashed Application Number Box
                 window.scrollTo({ top: document.getElementById('successBox').offsetTop - 50, behavior: 'smooth' });
 
             } catch (err) {
-                alert("Submission Error: " + err.message);
+                alert("Submission Processing Error: " + err.message);
                 console.error("Form Submission Error:", err);
+                resetSubmitButton();
+            }
+        }
+
+        function resetSubmitButton() {
+            const submitBtn = document.getElementById('btnSubmitApp');
+            if (submitBtn) {
+                submitBtn.disabled = false;
+                submitBtn.innerHTML = "Submit Application";
+                submitBtn.className = "w-full bg-green-700 hover:bg-green-600 text-white font-bold py-2.5 rounded transition cursor-pointer text-base shadow-md";
             }
         }
 
@@ -1529,6 +1592,7 @@
             document.getElementById('deptUser').value = document.getElementById('deptSelect').value;
         }
 
+        // DEPT QUEUE RENDERING WITH "NEW" FLASHING TAG LOGIC
         window.loadDeptQueue = function() {
             const db = window.getAppsData();
             const container = document.getElementById('caseQueueList'); 
@@ -1550,11 +1614,11 @@
             }
 
             if (filterStatus === 'HOLD') {
-                filtered = filtered.filter(a => a.objectionRaised === true || a.status.includes('Hold') || a.status.includes('Objection'));
+                filtered = filtered.filter(a => a.objectionRaised === true || (a.status && (a.status.includes('Hold') || a.status.includes('Objection'))));
             } else if (filterStatus === 'REJECTED') {
-                filtered = filtered.filter(a => a.status.includes('Rejected'));
+                filtered = filtered.filter(a => a.status && a.status.includes('Rejected'));
             } else if (filterStatus === 'IN_PROCESS') {
-                filtered = filtered.filter(a => !a.objectionRaised && !a.status.includes('Rejected'));
+                filtered = filtered.filter(a => !a.objectionRaised && (!a.status || !a.status.includes('Rejected')));
             }
 
             if (!filtered.length) {
@@ -1570,18 +1634,27 @@
                 if (app.objectionRaised) {
                     borderStyle = 'border-l-4 border-l-amber-500 bg-amber-50/60';
                     statusBadge = `<span class="text-amber-800 font-bold bg-amber-100 px-1 rounded">⚠️ HOLD / OBJECTION</span>`;
-                } else if (app.hasNewFile && app.status.includes('Returned')) {
+                } else if (app.hasNewFile && app.status && app.status.includes('Returned')) {
                     borderStyle = 'border-l-4 border-l-emerald-600 bg-emerald-50/60';
                     statusBadge = `<span class="text-emerald-800 font-bold bg-emerald-100 px-1 rounded">✓ RESOLVED (NEW FILE)</span>`;
-                } else if (app.status.includes('Rejected')) {
+                } else if (app.status && app.status.includes('Rejected')) {
                     borderStyle = 'border-l-4 border-l-red-600 bg-red-50/60';
                     statusBadge = `<span class="text-red-800 font-bold bg-red-100 px-1 rounded">❌ REJECTED</span>`;
+                }
+
+                // FLASHING "NEW" TAG IF APPLICATION IS UNREAD
+                let newTagHtml = '';
+                if (app.isNewUnread) {
+                    newTagHtml = `<span class="bg-red-600 text-white font-black text-[9px] px-1.5 py-0.5 rounded flash-text uppercase tracking-wider animate-pulse shrink-0">🆕 NEW</span>`;
                 }
 
                 card.className = `p-3 mb-2 border rounded cursor-pointer text-left shadow-sm transition hover:shadow-md ${selectedApplicationId === app.appNo ? 'ring-2 ring-amber-500 shadow-md' : ''} ${borderStyle}`;
                 card.onclick = () => selectCase(app.appNo);
                 card.innerHTML = `
-                    <p class="font-bold text-sm text-gray-900">Patient: ${app.name}</p>
+                    <div class="flex justify-between items-start gap-1">
+                        <p class="font-bold text-sm text-gray-900">Patient: ${app.name}</p>
+                        ${newTagHtml}
+                    </div>
                     <p class="text-[11px] text-amber-950 font-bold">Claimant: ${app.claimantName || 'N/A'}</p>
                     <div class="flex justify-between items-center text-[11px] mt-1">
                         <span class="text-gray-600 font-mono bg-gray-100 px-1.5 py-0.5 rounded border border-gray-200">${app.appNo}</span>
@@ -1593,10 +1666,20 @@
 
         function selectCase(appNo) {
             selectedApplicationId = appNo; 
-            loadDeptQueue();
             const db = window.getAppsData();
             const app = db.find(a => a.appNo === appNo);
             if (app) {
+                // Remove NEW flashing badge once case is opened
+                if (app.isNewUnread) {
+                    app.isNewUnread = false;
+                    try { localStorage.setItem('applications_db', JSON.stringify(db)); } catch(e){}
+                    if (typeof window.updateAppInCloud === 'function') {
+                        window.updateAppInCloud(app.appNo, { isNewUnread: false });
+                    }
+                }
+
+                loadDeptQueue();
+                
                 document.getElementById('noCaseSelected').classList.add('hidden-section');
                 document.getElementById('caseViewerArea').classList.remove('hidden-section');
                 
