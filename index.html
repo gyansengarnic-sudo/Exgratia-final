@@ -232,32 +232,32 @@
                             
                             <!-- Mandatory Upload File Options -->
                             <div class="border-t border-b py-3 my-2 space-y-3 bg-blue-50/50 p-3 rounded">
-                                <span class="block text-xs font-bold text-blue-900 uppercase">Mandatory Documents Upload (Maximum file size: 1000 KB per PDF) *</span>
+                                <span class="block text-xs font-bold text-blue-900 uppercase">Mandatory Documents Upload (Stored Directly in Cloud Database) *</span>
                                 
                                 <div>
                                     <label class="block text-xs font-semibold mb-1">1. Aadhaar Card (PDF Only) *</label>
                                     <input type="file" id="pDocAadhaar" accept=".pdf" required onchange="handleFileSelected(this, 'msgAadhaar')" class="w-full p-1.5 border rounded bg-white text-xs">
-                                    <span id="msgAadhaar" class="text-xs font-bold text-emerald-600 hidden-section mt-1 block">✓ File Uploaded Successfully</span>
+                                    <span id="msgAadhaar" class="text-xs font-bold text-emerald-600 hidden-section mt-1 block">✓ File Selected</span>
                                 </div>
                                 <div>
                                     <label class="block text-xs font-semibold mb-1">2. Medical History / Diagnostic Reports File (PDF Only) *</label>
                                     <input type="file" id="pDocMedical" accept=".pdf" required onchange="handleFileSelected(this, 'msgMedical')" class="w-full p-1.5 border rounded bg-white text-xs">
-                                    <span id="msgMedical" class="text-xs font-bold text-emerald-600 hidden-section mt-1 block">✓ File Uploaded Successfully</span>
+                                    <span id="msgMedical" class="text-xs font-bold text-emerald-600 hidden-section mt-1 block">✓ File Selected</span>
                                 </div>
                                 <div>
                                     <label class="block text-xs font-semibold mb-1">3. Antim Aadesh (PDF Only) *</label>
                                     <input type="file" id="pDocAntimAadesh" accept=".pdf" required onchange="handleFileSelected(this, 'msgAntimAadesh')" class="w-full p-1.5 border rounded bg-white text-xs">
-                                    <span id="msgAntimAadesh" class="text-xs font-bold text-emerald-600 hidden-section mt-1 block">✓ File Uploaded Successfully</span>
+                                    <span id="msgAntimAadesh" class="text-xs font-bold text-emerald-600 hidden-section mt-1 block">✓ File Selected</span>
                                 </div>
                                 <div>
                                     <label class="block text-xs font-semibold mb-1">4. Pro Rata Document (PDF Only) *</label>
                                     <input type="file" id="pDocProRata" accept=".pdf" required onchange="handleFileSelected(this, 'msgProRata')" class="w-full p-1.5 border rounded bg-white text-xs">
-                                    <span id="msgProRata" class="text-xs font-bold text-emerald-600 hidden-section mt-1 block">✓ File Uploaded Successfully</span>
+                                    <span id="msgProRata" class="text-xs font-bold text-emerald-600 hidden-section mt-1 block">✓ File Selected</span>
                                 </div>
                                 <div>
                                     <label class="block text-xs font-semibold mb-1">5. Any Other Supportive Document (PDF Only) *</label>
                                     <input type="file" id="pDocSupportive" accept=".pdf" required onchange="handleFileSelected(this, 'msgSupportive')" class="w-full p-1.5 border rounded bg-white text-xs">
-                                    <span id="msgSupportive" class="text-xs font-bold text-emerald-600 hidden-section mt-1 block">✓ File Uploaded Successfully</span>
+                                    <span id="msgSupportive" class="text-xs font-bold text-emerald-600 hidden-section mt-1 block">✓ File Selected</span>
                                 </div>
 
                                 <!-- PATIENT DECEASED STATUS RADIO BUTTON LOGIC -->
@@ -278,12 +278,12 @@
                                     <div id="deathCertContainer" class="hidden-section mt-3 border-t border-amber-200 pt-2">
                                         <label class="block text-xs font-semibold mb-1 text-gray-800">6. Death Certificate (PDF Only) [Optional]:</label>
                                         <input type="file" id="pDocDeath" accept=".pdf" onchange="handleFileSelected(this, 'msgDeath')" class="w-full p-1.5 border rounded bg-white text-xs">
-                                        <span id="msgDeath" class="text-xs font-bold text-emerald-600 hidden-section mt-1 block">✓ File Uploaded Successfully</span>
+                                        <span id="msgDeath" class="text-xs font-bold text-emerald-600 hidden-section mt-1 block">✓ File Selected</span>
                                     </div>
                                 </div>
 
-                                <span id="lblFileRestrictionNote" class="block text-xs font-bold text-red-600 mt-1 leading-normal">
-                                    ⚠️ Maximum file size limit: 1000 KB for each PDF.
+                                <span id="lblFileRestrictionNote" class="block text-xs font-bold text-blue-900 mt-1 leading-normal">
+                                    ☁️ Files are saved directly to Firebase Database Cloud Storage. Accessible from any PC.
                                 </span>
                             </div>
                             
@@ -320,7 +320,7 @@
                     </div>
                 </div>
 
-                <!-- Right Side Panel: Live News & Announcements -->
+                <!-- Right Side Panel: Live News & Announcements (RESTORED TO ORIGINAL FORMAT) -->
                 <div class="lg:col-span-1 bg-white/95 p-5 rounded-lg shadow-md border border-amber-200 flex flex-col h-full min-h-[750px]">
                     <div class="border-b-2 border-amber-500 pb-2 mb-3 flex items-center justify-between">
                         <h3 class="font-bold text-blue-900 text-base uppercase tracking-wide flex items-center gap-2">
@@ -364,7 +364,7 @@
 
                             <div class="p-3.5 bg-blue-50 border-l-4 border-blue-600 rounded shadow-xs shrink-0">
                                 <span class="bg-blue-800 text-white text-xs font-bold px-2 py-0.5 rounded uppercase">DOCUMENTATION</span>
-                                <p class="text-sm font-bold text-blue-950 mt-1">आवश्यक दस्तावेज़ों की सूची (Max 1000 KB each):</p>
+                                <p class="text-sm font-bold text-blue-950 mt-1">आवश्यक दस्तावेज़ों की सूची:</p>
                                 <ul class="text-xs text-gray-800 mt-1 space-y-1 list-disc pl-4 font-semibold">
                                     <li>1. Aadhaar Card (आधार कार्ड)</li>
                                     <li>2. Medical History / Diagnostic Reports</li>
@@ -516,7 +516,7 @@
 
                             <div id="dAuditNewFileWrapper" class="p-2 bg-emerald-50 border border-emerald-200 rounded flex justify-between items-center hidden-section">
                                 <div><span class="font-bold text-emerald-900">Corrected Re-upload PDF:</span><br><span id="dAuditNewName" class="font-mono text-emerald-700"></span></div>
-                                <button onclick="openBase64PDFTarget(selectedApplicationId, 'NEW')" class="bg-emerald-700 text-white px-2 py-1 rounded font-semibold text-[11px] hover:bg-emerald-600 cursor-pointer">Open</button>
+                                <button onclick="openPDFTarget(window.currentSelectedAppNewUrl)" class="bg-emerald-700 text-white px-2 py-1 rounded font-semibold text-[11px] hover:bg-emerald-600 cursor-pointer">Open</button>
                             </div>
                             
                             <div class="mt-3">
@@ -596,17 +596,19 @@
                                     <p>🪪 Aadhaar: <span id="vAadhaar" class="font-mono font-bold text-blue-900"></span></p>
                                     <p>👨‍👩‍👧 Family Samagra: <span id="vFamilySamagra" class="font-mono font-bold text-indigo-900"></span></p>
                                     <p>🆔 Member Samagra: <span id="vIndSamagra" class="font-mono font-bold text-indigo-900"></span></p>
+                                    <p>🔢 App No: <span id="vAppNo" class="font-mono font-bold text-indigo-900"></span></p>
+                                    <p>💳 BMHRC Card: <span id="vBmhrc" class="font-mono font-bold text-indigo-900"></span></p>
                                 </div>
                             </div>
                             <div class="text-right shrink-0">
-                                <span class="text-[11px] font-bold px-2.5 py-1.5 rounded bg-amber-100 text-amber-900 border border-amber-300 shadow-xs block" id="vCurrentStatus"></span>
+                                <span class="text-[11px] font-bold px-2.5 py-1.5 rounded shadow-xs block" id="vCurrentStatus"></span>
                             </div>
                         </div>
 
                         <!-- ALL PATIENT SUBMITTED DOCUMENTS VERIFICATION PANEL -->
                         <div class="bg-gray-50 p-3 rounded border border-gray-300">
                             <label class="block text-xs font-bold text-gray-800 uppercase tracking-wide mb-2 border-b pb-1">
-                                1. Patient Uploaded Documents Verification Panel (आवेदक के सभी दस्तावेज़)
+                                1. Patient Uploaded Documents Verification Panel (आवेदक के सभी दस्तावेज़ - Accessible Anywhere)
                             </label>
                             
                             <div id="ptDocAccessGrid" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-2 mt-2"></div>
@@ -617,7 +619,7 @@
                                     <span class="text-[10px] font-bold text-emerald-900 uppercase block">✓ RE-UPLOADED / CORRECTED DOCUMENT RECEIVED:</span>
                                     <span id="vNewFileName" class="text-xs font-mono font-bold text-emerald-950 truncate max-w-xs block"></span>
                                 </div>
-                                <button id="btnOpenNewPdf" onclick="openBase64PDFTarget(selectedApplicationId, 'NEW')" class="bg-emerald-700 hover:bg-emerald-800 text-white text-[11px] px-3 py-1.5 rounded font-bold cursor-pointer shadow-sm transition">📄 View Updated PDF</button>
+                                <button id="btnOpenNewPdf" onclick="openPDFTarget(window.currentSelectedAppNewUrl)" class="bg-emerald-700 hover:bg-emerald-800 text-white text-[11px] px-3 py-1.5 rounded font-bold cursor-pointer shadow-sm transition">📄 View Updated PDF</button>
                             </div>
                         </div>
 
@@ -636,7 +638,7 @@
                         <!-- ACTION & UPLOAD PANEL -->
                         <div class="bg-white p-4 rounded border-2 border-blue-200 shadow-md">
                             <div class="mb-4 p-3 bg-blue-50 border border-blue-200 rounded">
-                                <label class="block text-[11px] font-bold text-blue-900 uppercase mb-1">A. Upload Office Order / Note (फ़ाइल संलग्न करें - Max 1000 KB):</label>
+                                <label class="block text-[11px] font-bold text-blue-900 uppercase mb-1">A. Upload Office Order / Note (फ़ाइल संलग्न करें Cloud Storage):</label>
                                 <div class="flex flex-col sm:flex-row gap-2 items-start sm:items-center">
                                     <input type="file" id="deptUploadFileField" accept=".pdf" class="text-xs p-1.5 border border-blue-300 bg-white rounded flex-grow focus:outline-none">
                                     <button type="button" onclick="executeDepartmentUpload()" class="bg-blue-800 hover:bg-blue-700 text-white text-[11px] font-bold px-3 py-2 rounded cursor-pointer shrink-0 shadow-sm transition">📤 Upload & Save to Case</button>
@@ -698,10 +700,11 @@
         </div>
     </footer>
 
-    <!-- ================= FIREBASE REALTIME ENGINE MODULE ================= -->
+    <!-- ================= FIREBASE REALTIME ENGINE & STORAGE MODULE ================= -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-        import { getFirestore, collection, updateDoc, doc, onSnapshot, setDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+        import { getFirestore, collection, updateDoc, doc, onSnapshot, setDoc, increment } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+        import { getStorage, ref, uploadBytes, getDownloadURL } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-storage.js";
 
         const firebaseConfig = {
           apiKey: "AIzaSyBV0-SzZ5L1c6Ubp4YW86ajPZQSPkvd2Kc",
@@ -715,34 +718,42 @@
 
         const app = initializeApp(firebaseConfig);
         const db = getFirestore(app);
+        const storage = getStorage(app);
 
-        // Fail-safe Cloud Saving Engine
+        // Upload Helper Function - Saves files to Firebase Storage Cloud and returns accessible URL
+        window.uploadFileToCloud = async function(file, folderPath) {
+            if (!file) return "";
+            const fileRef = ref(storage, `${folderPath}/${Date.now()}_${file.name}`);
+            const snapshot = await uploadBytes(fileRef, file);
+            const downloadUrl = await getDownloadURL(snapshot.ref);
+            return downloadUrl;
+        };
+
+        // Realtime Global Visitor Counter via Database
+        window.initVisitorCounter = function() {
+            const counterRef = doc(db, "site_stats", "counter");
+            if (!sessionStorage.getItem('visited_session_counter')) {
+                sessionStorage.setItem('visited_session_counter', 'true');
+                updateDoc(counterRef, { totalVisits: increment(1) }).catch(() => {
+                    setDoc(counterRef, { totalVisits: 1 }, { merge: true });
+                });
+            }
+            onSnapshot(counterRef, (snapshot) => {
+                if (snapshot.exists()) {
+                    const count = snapshot.data().totalVisits || 0;
+                    const el = document.getElementById('visitorCountVal');
+                    if (el) el.innerText = count.toString().padStart(6, '0');
+                }
+            });
+        };
+
         window.saveAppToCloud = async function(appData) {
             try {
                 await setDoc(doc(db, "applications", appData.appNo), appData);
                 return true;
             } catch (e) {
-                console.warn("Full payload cloud save failed, storing lean version to Firestore:", e);
-                try {
-                    const cloudAppLean = { ...appData };
-                    cloudAppLean.fileBase64 = "";
-                    if (cloudAppLean.ptDocs) {
-                        const ptLean = {};
-                        for (let k in cloudAppLean.ptDocs) {
-                            ptLean[k] = { 
-                                title: cloudAppLean.ptDocs[k].title, 
-                                fileName: cloudAppLean.ptDocs[k].fileName, 
-                                base64: "" 
-                            };
-                        }
-                        cloudAppLean.ptDocs = ptLean;
-                    }
-                    await setDoc(doc(db, "applications", appData.appNo), cloudAppLean);
-                    return true;
-                } catch(err2) {
-                    console.error("Firestore setDoc failed:", err2);
-                    return false;
-                }
+                console.error("Firestore setDoc failed:", e);
+                return false;
             }
         };
 
@@ -757,7 +768,7 @@
             }
         };
 
-        // Real-Time Sync Engine with Non-destructive Memory Merging
+        // Real-Time Sync Engine across all PCs
         window.listenToCloudData = function() {
             onSnapshot(collection(db, "applications"), (snapshot) => {
                 const cloudApps = [];
@@ -765,52 +776,11 @@
                     cloudApps.push(doc.data());
                 });
 
-                if (!window.memoryAppsDb) window.memoryAppsDb = [];
+                window.memoryAppsDb = cloudApps;
 
-                const mergedMap = new Map();
-                
-                // 1. Existing In-Memory Items
-                window.memoryAppsDb.forEach(item => { if(item && item.appNo) mergedMap.set(item.appNo, item); });
-                
-                // 2. LocalStorage Items
                 try {
-                    const localApps = JSON.parse(localStorage.getItem('applications_db')) || [];
-                    localApps.forEach(item => { if(item && item.appNo) mergedMap.set(item.appNo, item); });
+                    localStorage.setItem('applications_db', JSON.stringify(cloudApps));
                 } catch(e) {}
-                
-                // 3. Cloud Firestore Items (Merging cleanly)
-                cloudApps.forEach(item => {
-                    if (item && item.appNo) {
-                        const existing = mergedMap.get(item.appNo);
-                        if (existing) {
-                            // Retain local base64 documents if cloud metadata is lean
-                            const mergedItem = { ...item };
-                            if (existing.ptDocs && (!item.ptDocs || !item.ptDocs.aadhaar || !item.ptDocs.aadhaar.base64)) {
-                                mergedItem.ptDocs = existing.ptDocs;
-                                mergedItem.fileBase64 = existing.fileBase64;
-                            }
-                            mergedMap.set(item.appNo, mergedItem);
-                        } else {
-                            mergedMap.set(item.appNo, item);
-                        }
-                    }
-                });
-
-                const finalAppsList = Array.from(mergedMap.values());
-                window.memoryAppsDb = finalAppsList;
-
-                // Safe Caching to LocalStorage
-                try {
-                    localStorage.setItem('applications_db', JSON.stringify(finalAppsList));
-                } catch (e) {
-                    try {
-                        const leanApps = finalAppsList.map(a => {
-                            const c = { ...a, fileBase64: "", newFileBase64: "" };
-                            return c;
-                        });
-                        localStorage.setItem('applications_db', JSON.stringify(leanApps));
-                    } catch (e2) {}
-                }
                 
                 if (typeof window.updateDashboard === 'function') window.updateDashboard();
                 if (window.loggedInDeptUser === 'director_admin') {
@@ -822,6 +792,7 @@
         };
 
         window.listenToCloudData();
+        window.initVisitorCounter();
     </script>
 
     <!-- ================= JAVASCRIPT SYSTEM ENGINE ================= -->
@@ -855,7 +826,6 @@
                 lblAadhaarNumber: "Aadhaar Number *",
                 lblAilmentType: "Ailment Type *", optSelectAilment: "-- Select Diagnosis Category --", optKidney: "Kidney Ailment", optPulmonary: "Cancer / Pulmonary Ailment",
                 lblBmhrcCard: "BMHRC Card Number (8 Digit)",
-                lblFileRestrictionNote: "⚠️ Maximum file size limit: 1000 KB for each PDF.",
                 lblCaptcha: "Security CAPTCHA:", btnRefreshCaptcha: "Refresh", captchaInput_placeholder: "Enter Captcha",
                 btnSubmitApp: "Submit Application", lblSuccessTitle: "✓ Application Submitted Successfully!",
                 lblAppNumberText: "Your unique Application Number is:", lblSuccessNote: "Kindly note this down to track your live status.",
@@ -882,7 +852,6 @@
                 lblAadhaarNumber: "आधार संख्या *",
                 lblAilmentType: "बीमारी का प्रकार *", optSelectAilment: "-- बीमारी/निदान श्रेणी चुनें --", optKidney: "किडनी (गुर्दे) की बीमारी", optPulmonary: "कैंसर / फेफड़े (पल्मोनरी) की बीमारी",
                 lblBmhrcCard: "BMHRC कार्ड संख्या (8 डिजिट)",
-                lblFileRestrictionNote: "⚠️ अधिकतम फ़ाइल आकार: प्रत्येक PDF के लिए 1000 KB।",
                 lblCaptcha: "सुरक्षा कैप्चा:", btnRefreshCaptcha: "रिफ्रेश", captchaInput_placeholder: "कैप्चा कोड भरें",
                 btnSubmitApp: "आवेदन जमा करें", lblSuccessTitle: "✓ आवेदन सफलतापूर्वक जमा हो गया है!",
                 lblAppNumberText: "आपका विशिष्ट आवेदन नंबर है:", lblSuccessNote: "कृपया लाइव स्थिति ट्रैक करने के लिए इसे नोट कर लें।",
@@ -917,42 +886,26 @@
             const msgSpan = document.getElementById(msgElementId);
             if (inputEl.files && inputEl.files.length > 0) {
                 const fileName = inputEl.files[0].name;
-                msgSpan.innerText = `✓ File Uploaded Successfully (${fileName})`;
+                msgSpan.innerText = `✓ Selected (${fileName})`;
                 msgSpan.classList.remove('hidden-section');
             } else {
                 msgSpan.classList.add('hidden-section');
             }
         }
 
-        function fileToBase64(file) {
-            return new Promise((resolve, reject) => {
-                const reader = new FileReader();
-                reader.readAsDataURL(file);
-                reader.onload = () => resolve(reader.result);
-                reader.onerror = error => reject(error);
-            });
-        }
-
-        window.openBase64PDFTarget = function(appNo, fileKey) {
-            const db = window.getAppsData();
-            const app = db.find(a => a.appNo === appNo);
-            if (!app) { alert("Application record not found."); return; }
-
-            let base64Data = "";
-            if (fileKey === 'ORIGINAL') base64Data = app.fileBase64;
-            else if (fileKey === 'NEW') base64Data = app.newFileBase64;
-            else if (app.ptDocs && app.ptDocs[fileKey]) {
-                base64Data = app.ptDocs[fileKey].base64;
-            } else {
-                const deptFile = (app.deptFiles || []).find(f => f.id === fileKey);
-                if (deptFile) base64Data = deptFile.fileBase64;
+        // Global File Opener: Handles Direct Cloud URLs and Base64 Fallbacks
+        window.openPDFTarget = function(fileUrlOrBase64) {
+            if (!fileUrlOrBase64) {
+                alert("File content or link is missing.");
+                return;
             }
-
-            if (base64Data && base64Data.startsWith("data:application/pdf")) {
+            if (fileUrlOrBase64.startsWith("http://") || fileUrlOrBase64.startsWith("https://")) {
+                window.open(fileUrlOrBase64, "_blank");
+            } else if (fileUrlOrBase64.startsWith("data:application/pdf")) {
                 const pdfWindow = window.open("");
-                pdfWindow.document.write(`<iframe width='100%' height='100%' src='${base64Data}'></iframe>`);
+                pdfWindow.document.write(`<iframe width='100%' height='100%' src='${fileUrlOrBase64}'></iframe>`);
             } else {
-                alert("File content missing or corrupted in browser memory cache.");
+                window.open(fileUrlOrBase64, "_blank");
             }
         };
 
@@ -984,7 +937,6 @@
                 'director_admin': { password: 'pass123', label: 'Director Admin (All PT Live Tracker Desk)' }
             }));
         }
-        if (!localStorage.getItem('applications_db')) localStorage.setItem('applications_db', JSON.stringify([]));
 
         let currentCaptcha = '', selectedApplicationId = null;
 
@@ -999,14 +951,8 @@
         };
 
         window.onload = function() {
-            generateCaptcha(); generateMobileCaptcha(); generateDeptCaptcha(); updateDashboard(); initVisitorCounter(); switchView('patient-portal'); changeLanguage();
+            generateCaptcha(); generateMobileCaptcha(); generateDeptCaptcha(); updateDashboard(); switchView('patient-portal'); changeLanguage();
         };
-
-        function initVisitorCounter() {
-            let count = parseInt(localStorage.getItem('portal_visitor_count')) || 0;
-            count++; localStorage.setItem('portal_visitor_count', count);
-            document.getElementById('visitorCountVal').innerText = count.toString().padStart(6, '0');
-        }
 
         function switchView(viewId) {
             ['patient-portal', 'status-portal', 'dept-login', 'dept-workspace', 'director-workspace'].forEach(id => {
@@ -1084,7 +1030,7 @@
             }, 800);
         }
 
-        // SUBMIT PATIENT APPLICATION WITH "IN PROGRESS" LOADING & FLASHING APPLICATION NUMBER
+        // SUBMIT PATIENT APPLICATION WITH FIREBASE CLOUD STORAGE UPLOADS
         async function handlePatientSubmit(e) {
             e.preventDefault();
             const submitBtn = document.getElementById('btnSubmitApp');
@@ -1128,7 +1074,7 @@
 
                 // Flash "In Progress" message on Submit Button & Disable
                 submitBtn.disabled = true;
-                submitBtn.innerHTML = "⌛ Your Application In Progress. Please Wait...";
+                submitBtn.innerHTML = "⌛ Uploading Files to Cloud Database. Please Wait...";
                 submitBtn.className = "w-full bg-amber-600 text-white font-bold py-3 rounded text-base shadow-md cursor-not-allowed animate-pulse";
 
                 const docInputs = [
@@ -1143,9 +1089,11 @@
                     docInputs.push({ id: 'pDocDeath', key: 'deathCert', label: 'Death Certificate', req: false });
                 }
 
-                const maxSize = 1000 * 1024; // 1000 KB limit
+                const appNo = 'BGT-' + Math.floor(100000 + Math.random() * 900000);
+                const submissionDate = new Date().toLocaleString();
                 const ptUploadedDocsMap = {};
 
+                // Upload documents to Firebase Storage
                 for (let docObj of docInputs) {
                     const inputEl = document.getElementById(docObj.id);
                     if (docObj.req && (!inputEl || !inputEl.files.length)) {
@@ -1155,26 +1103,15 @@
                     }
 
                     if (inputEl && inputEl.files.length) {
-                        if (inputEl.files[0].size > maxSize) {
-                            alert(`File [${docObj.label}] exceeds 1000 KB limit. Please upload a file smaller than 1000 KB.`);
-                            resetSubmitButton();
-                            return;
-                        }
-                        try {
-                            const b64 = await fileToBase64(inputEl.files[0]);
-                            ptUploadedDocsMap[docObj.key] = {
-                                title: docObj.label,
-                                fileName: inputEl.files[0].name,
-                                base64: b64
-                            };
-                        } catch (err) {
-                            console.error("Base64 conversion error: ", err);
-                        }
+                        const file = inputEl.files[0];
+                        const downloadUrl = await window.uploadFileToCloud(file, `applications/${appNo}`);
+                        ptUploadedDocsMap[docObj.key] = {
+                            title: docObj.label,
+                            fileName: file.name,
+                            url: downloadUrl
+                        };
                     }
                 }
-
-                const appNo = 'BGT-' + Math.floor(100000 + Math.random() * 900000);
-                const submissionDate = new Date().toLocaleString();
 
                 const newApp = {
                     appNo: appNo, 
@@ -1192,49 +1129,28 @@
                     bmhrc: bmhrc || "N/A", 
                     ailment: document.getElementById('pAilment').value,
                     isDeceased: isDeceased,
-                    isNewUnread: true, // FLAG FOR "NEW" FLASHING TAG ON DEPT QUEUE
+                    isNewUnread: true,
                     fileName: ptUploadedDocsMap.aadhaar ? ptUploadedDocsMap.aadhaar.fileName : 'doc.pdf', 
-                    fileBase64: ptUploadedDocsMap.aadhaar ? ptUploadedDocsMap.aadhaar.base64 : '',
                     ptDocs: ptUploadedDocsMap,
                     newFileName: "", 
-                    newFileBase64: "",
-                    status: 'Initial Scrutiny Pending', 
+                    newFileUrl: "",
+                    status: 'In Progress', 
                     currentStage: 'dir_scrutiny',
                     objectionRaised: false, 
                     objectionRemarks: '', 
                     hasNewFile: false,
                     heldByOffice: '', 
-                    isFinalObjectionStalled: false, 
                     deptFiles: [],
                     history: [{ stage: 'Patient Submission', remarks: 'Online application submitted successfully with documents.', date: submissionDate }]
                 };
 
-                // Add to In-memory state array immediately
-                if (!window.memoryAppsDb) window.memoryAppsDb = [];
-                window.memoryAppsDb.push(newApp);
-
-                // Safe Save to LocalStorage
-                try {
-                    const db = JSON.parse(localStorage.getItem('applications_db')) || [];
-                    db.push(newApp); 
-                    localStorage.setItem('applications_db', JSON.stringify(db));
-                } catch (quotaErr) {
-                    try {
-                        const leanApp = { ...newApp, fileBase64: "" };
-                        const db = JSON.parse(localStorage.getItem('applications_db')) || [];
-                        db.push(leanApp);
-                        localStorage.setItem('applications_db', JSON.stringify(db));
-                    } catch (e2) {}
-                }
-
-                // Push to Cloud Firestore
+                // Save to Cloud Firestore
                 if (typeof window.saveAppToCloud === 'function') {
                     await window.saveAppToCloud(newApp);
                 }
                 
                 simulateSMSAlert(mobile, appNo, "APPLICATION SUBMITTED SUCCESSFULLY", "Your application has been registered for ex-gratia processing. Save your application number.");
 
-                // Flash Big Application Number on Screen
                 document.getElementById('resAppNo').innerText = appNo;
                 document.getElementById('successBox').classList.remove('hidden-section');
                 document.getElementById('patientForm').reset();
@@ -1258,7 +1174,6 @@
                 updateDashboard();
                 resetSubmitButton();
 
-                // Scroll smoothly to Flashed Application Number Box
                 window.scrollTo({ top: document.getElementById('successBox').offsetTop - 50, behavior: 'smooth' });
 
             } catch (err) {
@@ -1301,7 +1216,6 @@
             if (!selectedApplicationId) return;
             const fileField = document.getElementById('deptUploadFileField');
             if (!fileField.files.length) { alert("Please select an office order/PDF file to upload."); return; }
-            if (fileField.files[0].size > 1000 * 1024) { alert("File exceeds 1000 KB limit."); return; }
 
             const db = window.getAppsData();
             const app = db.find(a => a.appNo === selectedApplicationId);
@@ -1309,33 +1223,30 @@
 
             if (app) {
                 const docId = 'DEPT-' + Date.now();
-                const uploadedFileName = fileField.files[0].name;
-                const base64File = await fileToBase64(fileField.files[0]);
+                const uploadedFile = fileField.files[0];
+                const fileUrl = await window.uploadFileToCloud(uploadedFile, `dept_orders/${app.appNo}`);
                 
+                if (!app.deptFiles) app.deptFiles = [];
                 app.deptFiles.push({
                     id: docId,
                     byOffice: creds[window.loggedInDeptUser].label,
                     byOfficeKey: window.loggedInDeptUser, 
-                    fileName: uploadedFileName,
-                    fileBase64: base64File,
+                    fileName: uploadedFile.name,
+                    fileUrl: fileUrl,
                     date: new Date().toLocaleString()
                 });
 
                 app.history.push({ 
                     stage: creds[window.loggedInDeptUser].label, 
-                    remarks: `Uploaded document: [${uploadedFileName}]`, 
+                    remarks: `Uploaded official order document: [${uploadedFile.name}]`, 
                     date: new Date().toLocaleString() 
                 });
-
-                try {
-                    localStorage.setItem('applications_db', JSON.stringify(db));
-                } catch(e) {}
 
                 if (typeof window.updateAppInCloud === 'function') {
                     await window.updateAppInCloud(app.appNo, app);
                 }
 
-                alert("Official Document/Order uploaded successfully!");
+                alert("Official Document/Order uploaded and saved to Cloud Database!");
                 fileField.value = '';
                 selectCase(selectedApplicationId);
             }
@@ -1357,44 +1268,39 @@
             if (record.deptFiles && record.deptFiles.length > 0) {
                 ptRestrictedViewHtml = `
                     <div class="mt-3 p-3 bg-zinc-100 rounded border border-zinc-300 shadow-inner">
-                        <p class="text-xs font-bold text-zinc-800 uppercase mb-2 border-b pb-1">📜 Issued Official Action Documents (विभागीय दस्तावेज़ सूची - सुरक्षित केवल दर्शन):</p>
+                        <p class="text-xs font-bold text-zinc-800 uppercase mb-2 border-b pb-1">📜 Issued Official Action Documents (विभागीय दस्तावेज़ सूची):</p>
                         <ul class="space-y-1 text-xs text-gray-700">`;
                 record.deptFiles.forEach(f => {
-                    ptRestrictedViewHtml += `<li class="p-1 bg-white rounded border border-gray-100 font-mono text-[11px]">📄 ${f.byOffice} - ${f.fileName} (${f.date}) [Protected View Only]</li>`;
+                    ptRestrictedViewHtml += `<li class="p-1.5 bg-white rounded border border-gray-200 font-mono text-[11px] flex justify-between items-center">
+                        <span>📄 ${f.byOffice} - ${f.fileName} (${f.date})</span>
+                        <button onclick="openPDFTarget('${f.fileUrl}')" class="bg-blue-800 text-white text-[10px] px-2 py-0.5 rounded font-bold">View</button>
+                    </li>`;
                 });
                 ptRestrictedViewHtml += `</ul></div>`;
             }
 
             let objectionBoxHtml = '';
             if (record.objectionRaised) {
-                if (record.isFinalObjectionStalled) {
-                    objectionBoxHtml = `
-                        <div class="p-3 bg-red-100 border-l-4 border-l-red-600 text-red-950 rounded my-3 shadow-md">
-                            <p class="font-black text-sm text-red-700">❌ CRITICAL DISCREPANCY BLOCK (सुधार का मौका समाप्त):</p>
-                            <p class="text-xs font-bold mt-1 bg-white p-3 border rounded leading-relaxed">
-                                आपके आवेदन में दोबारा त्रुटि पाई गई है। ऑनलाइन सुधार की **1 ही बार** अनुमति दी जाती है। अब आपको अपने **मूल दस्तावेजों (Original Documents)** एवं बीएमएचआरसी स्मार्ट कार्ड के साथ संबंधित संचालननालय गैस राहत कार्यालय में भौतिक रूप से उपस्थित होकर मैन्युअल सत्यापन (Physical Verification) कराना अनिवार्य होगा।
-                            </p>
-                        </div>`;
-                } else {
-                    objectionBoxHtml = `
-                        <div class="p-3 bg-amber-50 border-l-4 border-l-amber-500 text-amber-900 rounded my-3 shadow-sm">
-                            <p class="font-bold text-sm">⚠️ OBJECTION / DEFICIENCY MESSAGE (विभाग की आपत्ति):</p>
-                            <p class="text-xs italic bg-white p-2 border rounded font-mono my-1 font-bold text-red-900">${record.objectionRemarks}</p>
+                objectionBoxHtml = `
+                    <div class="p-3 bg-amber-50 border-l-4 border-l-amber-500 text-amber-900 rounded my-3 shadow-sm">
+                        <p class="font-bold text-sm">⚠️ OBJECTION / DEFICIENCY MESSAGE (विभाग की आपत्ति):</p>
+                        <p class="text-xs italic bg-white p-2 border rounded font-mono my-1 font-bold text-red-900">${record.objectionRemarks}</p>
+                        
+                        <div class="mt-3 p-3 bg-white border border-gray-200 rounded text-gray-800">
+                            <label class="block text-xs font-bold uppercase mb-1">Re-upload Corrected/Missing Document (PDF Only):</label>
+                            <input type="file" id="reUploadFileField" accept=".pdf" class="w-full text-xs p-1.5 border border-gray-300 rounded mb-2 focus:outline-none">
                             
-                            <div class="p-2 bg-red-50 border border-red-200 text-red-950 text-xs rounded my-2 font-medium leading-normal">
-                                📢 **महत्वपूर्ण सूचना:** आपको आवेदन में त्रुटि सुधार करने का **केवल एक ही (1) बार** मौका दिया जा रहा है। यदि दोबारा अपलोड किए गए दस्तावेज़ में त्रुटि पाई जाती है, तो ऑनलाइन पटल ब्लॉक हो जाएगा और आपको मूल दस्तावेजों के साथ संबंधित कार्यालय में उपस्थित होकर भौतिक सत्यापन कराना अनिवार्य होगा।
-                            </div>
+                            <label class="block text-xs font-bold uppercase mb-1">Comment / Reply to Objection (अपना उत्तर / टिप्पणी दर्ज करें) *:</label>
+                            <textarea id="reUploadCommentField" rows="2" placeholder="Enter your response / explanation here..." class="w-full p-2 border border-gray-300 rounded text-xs mb-2"></textarea>
 
-                            <div class="mt-3 p-3 bg-white border border-gray-200 rounded text-gray-800">
-                                <label class="block text-xs font-bold uppercase mb-1">Re-upload Corrected/Missing Document (PDF Only, Max 1000 KB):</label>
-                                <div class="flex gap-2 items-center">
-                                    <input type="file" id="reUploadFileField" accept=".pdf" class="w-full text-xs p-1.5 border border-gray-300 rounded focus:outline-none">
-                                    <button onclick="executePatientReupload('${record.appNo}')" class="bg-blue-700 hover:bg-blue-600 text-white text-[11px] font-bold px-4 py-2 rounded cursor-pointer shadow transition shrink-0">Submit Missing Document</button>
-                                </div>
-                            </div>
-                        </div>`;
-                }
+                            <button onclick="executePatientReupload('${record.appNo}')" class="w-full bg-blue-700 hover:bg-blue-600 text-white text-xs font-bold py-2 rounded cursor-pointer shadow transition">Submit Document & Comment</button>
+                        </div>
+                    </div>`;
             }
+
+            let statusBadge = record.objectionRaised ? 
+                '<span class="px-2 py-0.5 rounded text-xs font-bold bg-amber-100 text-amber-800 border border-amber-300">On Hold</span>' : 
+                '<span class="px-2 py-0.5 rounded text-xs font-bold bg-blue-100 text-blue-800 border border-blue-300">In Progress</span>';
 
             box.innerHTML = `
                 <div class="border-b pb-3 mb-3">
@@ -1404,7 +1310,7 @@
                     <p class="text-xs text-red-900 font-bold">Disease: ${record.diseaseName || 'N/A'}</p>
                     <p class="text-sm mt-1">Application Received Date: <strong class="text-gray-700">${record.receivedDate || 'N/A'}</strong></p>
                     <p class="text-sm mt-1">Live Processing Department: <strong class="text-indigo-900">${currentActiveDeskName}</strong></p>
-                    <p class="text-sm mt-1">Live Status: <span class="px-2 py-0.5 rounded text-xs font-bold shadow-xs ${record.objectionRaised ? 'bg-amber-100 text-amber-800 border border-amber-300' : 'bg-blue-100 text-blue-800 border border-blue-300'}">${record.status}</span></p>
+                    <p class="text-sm mt-1">Live Status: ${statusBadge}</p>
                     ${objectionBoxHtml}
                     ${ptRestrictedViewHtml}
                 </div>`;
@@ -1412,38 +1318,39 @@
 
         async function executePatientReupload(appNo) {
             const fileField = document.getElementById('reUploadFileField');
+            const commentField = document.getElementById('reUploadCommentField');
+
             if (!fileField || !fileField.files.length) { alert("Please select a missing/corrected PDF file first."); return; }
-            if (fileField.files[0].size > 1000 * 1024) { alert("File size must be under 1000 KB limit."); return; }
+            const comment = commentField ? commentField.value.trim() : "";
+            if (!comment) { alert("Please enter your comment / explanation response."); return; }
 
             const db = window.getAppsData();
             const app = db.find(a => a.appNo === appNo);
             if (app) {
-                const base64NewDoc = await fileToBase64(fileField.files[0]);
-                app.newFileName = fileField.files[0].name;
-                app.newFileBase64 = base64NewDoc;
+                const uploadedFile = fileField.files[0];
+                const downloadUrl = await window.uploadFileToCloud(uploadedFile, `patient_reuploads/${appNo}`);
+
+                app.newFileName = uploadedFile.name;
+                app.newFileUrl = downloadUrl;
                 app.hasNewFile = true;
-                app.objectionRaised = false;
+                app.objectionRaised = false; // Hold Removed, now In Progress
                 
                 if (app.heldByOffice) {
                     app.currentStage = app.heldByOffice;
                 }
                 
-                app.status = 'Objection Resolved - Returned to Review Desk';
+                app.status = 'In Progress';
                 app.history.push({ 
                     stage: 'Applicant Correction Upload', 
-                    remarks: `Submitted requested corrected document: [${app.newFileName}]. File returned back to review queue.`, 
+                    remarks: `Submitted requested corrected document: [${uploadedFile.name}]. Comment: "${comment}". Returned to review queue.`, 
                     date: new Date().toLocaleString() 
                 });
-                
-                try {
-                    localStorage.setItem('applications_db', JSON.stringify(db));
-                } catch(e) {}
 
                 if (typeof window.updateAppInCloud === 'function') {
                     await window.updateAppInCloud(app.appNo, app);
                 }
 
-                alert("Missing document uploaded successfully! Pushed straight back to the department desk.");
+                alert("Document and response submitted successfully! Returned to department review queue.");
                 trackApplication(); 
                 updateDashboard();
             } else {
@@ -1483,14 +1390,16 @@
             tbody.innerHTML = '';
 
             if (db.length === 0) {
-                tbody.innerHTML = `<tr><td colspan="11" class="p-4 text-center text-gray-400 italic">No patient records exist in global storage data pipelines.</td></tr>`;
+                tbody.innerHTML = `<tr><td colspan="11" class="p-4 text-center text-gray-400 italic">No patient records exist in global database pipelines.</td></tr>`;
                 return;
             }
 
             db.forEach((app, index) => {
                 let deskName = deptDeskLabels[app.currentStage] || app.currentStage;
-                let recDate = app.receivedDate || (app.history && app.history[0] ? app.history[0].date : 'N/A');
-                
+                let statusBadge = app.objectionRaised ? 
+                    '<span class="px-2 py-0.5 rounded text-[10px] font-bold bg-amber-100 text-amber-800 border border-amber-300">On Hold</span>' : 
+                    '<span class="px-2 py-0.5 rounded text-[10px] font-bold bg-blue-100 text-blue-800 border border-blue-300">In Progress</span>';
+
                 const tr = document.createElement('tr');
                 tr.className = "border-b border-gray-200 hover:bg-gray-50 text-xs";
                 tr.innerHTML = `
@@ -1503,9 +1412,7 @@
                     <td class="p-2 border-r font-mono">${app.mobile}</td>
                     <td class="p-2 border-r text-xs">${app.diseaseName || app.ailment}</td>
                     <td class="p-2 border-r font-semibold text-indigo-950">${deskName}</td>
-                    <td class="p-2 border-r">
-                        <span class="px-2 py-0.5 rounded text-[10px] font-bold ${app.objectionRaised ? 'bg-amber-100 text-amber-800 border border-amber-300':'bg-blue-100 text-blue-800'}">${app.status}</span>
-                    </td>
+                    <td class="p-2 border-r">${statusBadge}</td>
                     <td class="p-2 text-center">
                         <button onclick="auditApplicationDirector('${app.appNo}')" class="bg-blue-900 hover:bg-blue-800 text-white font-bold px-2 py-1 rounded text-[10px] shadow-sm transition cursor-pointer">Audit</button>
                     </td>
@@ -1533,18 +1440,14 @@
                     const item = document.createElement('div');
                     item.className = "p-2 bg-blue-50 border border-blue-200 rounded flex justify-between items-center";
                     item.innerHTML = `<div><span class="font-bold text-blue-950">${doc.title}:</span><br><span class="font-mono text-[10px] text-gray-600">${doc.fileName}</span></div>
-                                      <button onclick="openBase64PDFTarget('${app.appNo}', '${key}')" class="bg-blue-800 text-white px-2 py-1 rounded font-bold text-[10px] hover:bg-blue-700 cursor-pointer">View</button>`;
+                                      <button onclick="openPDFTarget('${doc.url}')" class="bg-blue-800 text-white px-2 py-1 rounded font-bold text-[10px] hover:bg-blue-700 cursor-pointer">View</button>`;
                     ptFilesContainer.appendChild(item);
                 }
-            } else {
-                ptFilesContainer.innerHTML = `<div class="p-2 bg-gray-50 border rounded flex justify-between items-center">
-                    <div><span class="font-bold">Original Submission PDF:</span><br><span class="font-mono text-gray-500">${app.fileName}</span></div>
-                    <button onclick="openBase64PDFTarget('${app.appNo}', 'ORIGINAL')" class="bg-blue-800 text-white px-2 py-1 rounded font-semibold text-[11px] hover:bg-blue-700 cursor-pointer">Open</button>
-                </div>`;
             }
 
             const newFileWrapper = document.getElementById('dAuditNewFileWrapper');
             if (app.hasNewFile) {
+                window.currentSelectedAppNewUrl = app.newFileUrl;
                 newFileWrapper.classList.remove('hidden-section');
                 document.getElementById('dAuditNewName').innerText = app.newFileName;
             } else {
@@ -1558,7 +1461,7 @@
                     const d = document.createElement('div');
                     d.className = "flex justify-between items-center bg-gray-100 border p-1.5 rounded text-[11px] mt-1";
                     d.innerHTML = `<span>📎 ${f.fileName} (<strong class="text-blue-900">${f.byOfficeKey}</strong>)</span>
-                                   <button onclick="openBase64PDFTarget('${app.appNo}', '${f.id}')" class="text-indigo-600 underline font-bold ml-2 cursor-pointer">Open View</button>`;
+                                   <button onclick="openPDFTarget('${f.fileUrl}')" class="text-indigo-600 underline font-bold ml-2 cursor-pointer">Open View</button>`;
                     internalContainer.appendChild(d);
                 });
             } else {
@@ -1592,7 +1495,7 @@
             document.getElementById('deptUser').value = document.getElementById('deptSelect').value;
         }
 
-        // DEPT QUEUE RENDERING WITH "NEW" FLASHING TAG LOGIC
+        // DEPT QUEUE RENDERING WITH IN PROGRESS / ON HOLD BADGES
         window.loadDeptQueue = function() {
             const db = window.getAppsData();
             const container = document.getElementById('caseQueueList'); 
@@ -1614,7 +1517,7 @@
             }
 
             if (filterStatus === 'HOLD') {
-                filtered = filtered.filter(a => a.objectionRaised === true || (a.status && (a.status.includes('Hold') || a.status.includes('Objection'))));
+                filtered = filtered.filter(a => a.objectionRaised === true);
             } else if (filterStatus === 'REJECTED') {
                 filtered = filtered.filter(a => a.status && a.status.includes('Rejected'));
             } else if (filterStatus === 'IN_PROCESS') {
@@ -1629,20 +1532,16 @@
                 const card = document.createElement('div');
                 
                 let borderStyle = 'border-l-4 border-l-blue-600 bg-white';
-                let statusBadge = `<span class="text-blue-700 font-semibold">${app.ailment}</span>`;
+                let statusBadge = `<span class="text-blue-800 font-bold bg-blue-100 px-1.5 py-0.5 rounded text-[10px]">IN PROGRESS</span>`;
 
                 if (app.objectionRaised) {
                     borderStyle = 'border-l-4 border-l-amber-500 bg-amber-50/60';
-                    statusBadge = `<span class="text-amber-800 font-bold bg-amber-100 px-1 rounded">⚠️ HOLD / OBJECTION</span>`;
-                } else if (app.hasNewFile && app.status && app.status.includes('Returned')) {
-                    borderStyle = 'border-l-4 border-l-emerald-600 bg-emerald-50/60';
-                    statusBadge = `<span class="text-emerald-800 font-bold bg-emerald-100 px-1 rounded">✓ RESOLVED (NEW FILE)</span>`;
+                    statusBadge = `<span class="text-amber-800 font-bold bg-amber-100 px-1.5 py-0.5 rounded text-[10px]">⚠️ ON HOLD</span>`;
                 } else if (app.status && app.status.includes('Rejected')) {
                     borderStyle = 'border-l-4 border-l-red-600 bg-red-50/60';
-                    statusBadge = `<span class="text-red-800 font-bold bg-red-100 px-1 rounded">❌ REJECTED</span>`;
+                    statusBadge = `<span class="text-red-800 font-bold bg-red-100 px-1.5 py-0.5 rounded text-[10px]">❌ REJECTED</span>`;
                 }
 
-                // FLASHING "NEW" TAG IF APPLICATION IS UNREAD
                 let newTagHtml = '';
                 if (app.isNewUnread) {
                     newTagHtml = `<span class="bg-red-600 text-white font-black text-[9px] px-1.5 py-0.5 rounded flash-text uppercase tracking-wider animate-pulse shrink-0">🆕 NEW</span>`;
@@ -1669,10 +1568,8 @@
             const db = window.getAppsData();
             const app = db.find(a => a.appNo === appNo);
             if (app) {
-                // Remove NEW flashing badge once case is opened
                 if (app.isNewUnread) {
                     app.isNewUnread = false;
-                    try { localStorage.setItem('applications_db', JSON.stringify(db)); } catch(e){}
                     if (typeof window.updateAppInCloud === 'function') {
                         window.updateAppInCloud(app.appNo, { isNewUnread: false });
                     }
@@ -1695,8 +1592,16 @@
                 document.getElementById('vIndSamagra').innerText = app.indSamagra || 'N/A';
                 document.getElementById('vAppNo').innerText = app.appNo;
                 document.getElementById('vBmhrc').innerText = app.bmhrc || 'N/A';
-                document.getElementById('vCurrentStatus').innerText = app.status;
                 
+                const statusBox = document.getElementById('vCurrentStatus');
+                if (app.objectionRaised) {
+                    statusBox.innerText = "On Hold";
+                    statusBox.className = "text-[11px] font-bold px-2.5 py-1.5 rounded bg-amber-100 text-amber-900 border border-amber-300 shadow-xs block";
+                } else {
+                    statusBox.innerText = "In Progress";
+                    statusBox.className = "text-[11px] font-bold px-2.5 py-1.5 rounded bg-blue-100 text-blue-900 border border-blue-300 shadow-xs block";
+                }
+
                 isCurrentSessionDeptVerified = false;
                 generateDeptCaptcha();
                 document.getElementById('deptCaptchaInput').value = '';
@@ -1718,23 +1623,17 @@
                         card.innerHTML = `
                             <span class="text-[10px] font-bold text-blue-900 block mb-0.5">${docObj.title}</span>
                             <span class="text-[10px] font-mono text-gray-500 truncate w-full block mb-2">${docObj.fileName}</span>
-                            <button onclick="openBase64PDFTarget('${app.appNo}', '${key}')" class="bg-blue-800 hover:bg-blue-900 text-white text-[10px] px-2.5 py-1 rounded font-bold cursor-pointer transition shadow-xs w-full">📄 Verify File</button>
+                            <button onclick="openPDFTarget('${docObj.url}')" class="bg-blue-800 hover:bg-blue-900 text-white text-[10px] px-2.5 py-1 rounded font-bold cursor-pointer transition shadow-xs w-full">📄 Verify File</button>
                         `;
                         ptGrid.appendChild(card);
                     }
-                } else {
-                    ptGrid.innerHTML = `
-                        <div class="bg-white p-2 border border-blue-200 rounded text-center flex flex-col justify-between items-center shadow-xs">
-                            <span class="text-[10px] font-bold text-blue-900 block mb-0.5">Primary Application File</span>
-                            <span class="text-[10px] font-mono text-gray-500 truncate w-full block mb-2">${app.fileName}</span>
-                            <button onclick="openBase64PDFTarget('${app.appNo}', 'ORIGINAL')" class="bg-blue-800 hover:bg-blue-900 text-white text-[10px] px-2.5 py-1 rounded font-bold cursor-pointer transition shadow-xs w-full">📄 Verify File</button>
-                        </div>`;
                 }
 
                 const newFileBox = document.getElementById('vNewFileContainer');
                 const newFileNameLabel = document.getElementById('vNewFileName');
 
                 if (app.hasNewFile) {
+                    window.currentSelectedAppNewUrl = app.newFileUrl;
                     newFileBox.classList.remove('hidden-section');
                     newFileNameLabel.innerText = app.newFileName;
                 } else {
@@ -1754,7 +1653,7 @@
                                 </div>
                                 <div class="flex items-center justify-between bg-gray-50 border rounded px-2 py-1 mt-auto">
                                     <span class="text-[10px] font-mono text-gray-600 truncate mr-2" title="${f.fileName}">📎 ${f.fileName}</span>
-                                    <button type="button" onclick="openBase64PDFTarget('${app.appNo}', '${f.id}')" class="bg-indigo-600 hover:bg-indigo-700 text-white font-bold px-2 py-1 rounded text-[10px] cursor-pointer shadow-sm shrink-0 transition">👁️ View File</button>
+                                    <button type="button" onclick="openPDFTarget('${f.fileUrl}')" class="bg-indigo-600 hover:bg-indigo-700 text-white font-bold px-2 py-1 rounded text-[10px] cursor-pointer shadow-sm shrink-0 transition">👁️ View File</button>
                                 </div>
                             </div>`;
                     });
@@ -1778,7 +1677,7 @@
             const remarks = document.getElementById('deptRemarks').value.trim();
             
             if ((decision === 'REJECTED' || decision === 'HOLD') && remarks === '') {
-                alert("Error: Remarks column is compulsory. Please enter the specific reason or objection criteria before executing this action so that the patient can correct it.");
+                alert("Error: Remarks column is compulsory. Please enter the specific reason or objection criteria before executing this action.");
                 return;
             }
 
@@ -1797,39 +1696,31 @@
                 app.objectionRaised = false;
                 simulateSMSAlert(app.mobile, app.appNo, "APPLICATION REJECTED (आवेदन निरस्त)", `Reason: ${remarks}`);
             } else if (decision === 'HOLD') {
-                if (app.hasNewFile) {
-                    app.isFinalObjectionStalled = true;
-                    app.status = 'Stalled - Physical Verification Compulsory';
-                    simulateSMSAlert(app.mobile, app.appNo, "CORRECTION BLOCK - OBJECTION STALLED", "Objection raised again. Your online edit privilege is over. Bring original papers to Gas Relief Directorate.");
-                } else {
-                    app.status = 'Application Stalled / On Hold (ऑब्जेक्शन दर्ज)';
-                    app.objectionRaised = true; 
-                    app.objectionRemarks = remarks;
-                    app.heldByOffice = window.loggedInDeptUser;
-                    simulateSMSAlert(app.mobile, app.appNo, "APPLICATION STALLED / ON HOLD (आपत्ति दर्ज)", `Objection: ${remarks}`);
-                }
+                app.status = 'On Hold';
+                app.objectionRaised = true; 
+                app.objectionRemarks = remarks;
+                app.heldByOffice = window.loggedInDeptUser;
+                app.hasNewFile = false; // Reset so patient can re-upload again
+                simulateSMSAlert(app.mobile, app.appNo, "APPLICATION STALLED / ON HOLD (आपत्ति दर्ज)", `Objection: ${remarks}`);
             } else {
                 app.objectionRaised = false;
+                app.status = 'In Progress';
                 const oldStage = app.currentStage;
                 
-                if (app.currentStage === 'dir_scrutiny') { app.currentStage = (app.ailment === 'Kidney') ? 'hosp_kidney' : 'hosp_pulmo'; app.status = 'Hospital Verification Stage'; }
-                else if (app.currentStage === 'hosp_kidney' || app.currentStage === 'hosp_pulmo') { app.currentStage = 'dir_compile'; app.status = 'Report Compilation Pending'; }
-                else if (app.currentStage === 'dir_compile') { app.currentStage = 'welfare_comm'; app.status = 'Awaiting Final Decision'; }
+                if (app.currentStage === 'dir_scrutiny') { app.currentStage = (app.ailment === 'Kidney') ? 'hosp_kidney' : 'hosp_pulmo'; }
+                else if (app.currentStage === 'hosp_kidney' || app.currentStage === 'hosp_pulmo') { app.currentStage = 'dir_compile'; }
+                else if (app.currentStage === 'dir_compile') { app.currentStage = 'welfare_comm'; }
                 else if (app.currentStage === 'welfare_comm') { app.currentStage = 'completed_disbursed'; app.status = 'Approved for Financial DBT Disbursement'; }
                 
                 if (oldStage === 'dir_compile') {
-                    simulateSMSAlert(app.mobile, app.appNo, "VERIFIED AND APPROVED BY GAS RAHAT DEPT", "Your application has been Verified and Approved by Gas Rahat Dept. and sent to Welfare Commissioner office.");
+                    simulateSMSAlert(app.mobile, app.appNo, "VERIFIED AND APPROVED BY GAS RAHAT DEPT", "Your application has been Verified and Approved by Gas Rahat Dept.");
                 } else if (oldStage === 'welfare_comm') {
-                    simulateSMSAlert(app.mobile, app.appNo, "FINAL EX-GRATIA APPROVAL SUCCESSFUL", "Your ex-gratia amount application has received final approval from Welfare Commissioner. Payment sent via DBT.");
+                    simulateSMSAlert(app.mobile, app.appNo, "FINAL EX-GRATIA APPROVAL SUCCESSFUL", "Your ex-gratia amount application has received final approval from Welfare Commissioner.");
                 }
             }
 
             app.history.push({ stage: creds[window.loggedInDeptUser].label + ' [Captcha Verified]', remarks: `Decision: ${decision}. Note: ${remarks || 'Approved'}`, date: new Date().toLocaleString() });
             
-            try {
-                localStorage.setItem('applications_db', JSON.stringify(db));
-            } catch(e) {}
-
             if (typeof window.updateAppInCloud === 'function') {
                 await window.updateAppInCloud(app.appNo, app);
             }
