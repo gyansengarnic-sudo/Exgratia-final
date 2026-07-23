@@ -622,10 +622,11 @@
                         <div>
                             <label class="block text-[10px] font-bold text-blue-900 uppercase">⚡ Filter By Workflow Status:</label>
                             <select id="deptFilterStatus" onchange="loadDeptQueue()" class="w-full text-xs p-1.5 border border-blue-300 rounded bg-white focus:outline-none font-semibold">
-                                <option value="ALL">📁 All Pipeline Records</option>
-                                <option value="IN_PROCESS">🔵 In-Process / Forwarded</option>
+                                <option value="IN_PROCESS">🔵 Pending Action (In-Progress)</option>
                                 <option value="HOLD">⚠️ Hold / Objection Raised</option>
+                                <option value="APPROVED_FORWARDED">🟢 Approved & Forwarded</option>
                                 <option value="REJECTED">❌ Rejected Files</option>
+                                <option value="ALL">📁 All Pipeline Records</option>
                             </select>
                         </div>
 
@@ -727,7 +728,7 @@
                         </div>
 
                         <!-- ACTION & UPLOAD PANEL -->
-                        <div class="bg-white p-4 rounded border-2 border-blue-200 shadow-md">
+                        <div id="caseActionControlsBox" class="bg-white p-4 rounded border-2 border-blue-200 shadow-md">
                             <div class="mb-4 p-3 bg-blue-50 border border-blue-200 rounded">
                                 <label class="block text-[11px] font-bold text-blue-900 uppercase mb-1">A. Upload Office Order / Note (फ़ाइल संलग्न करें Cloud Database):</label>
                                 <div class="flex flex-col sm:flex-row gap-2 items-start sm:items-center">
@@ -1328,6 +1329,7 @@
                     isDeceased: isDeceased,
                     isNewUnread: true,
                     ptRepliedFlash: false,
+                    passedStages: [],
                     fileName: window.uploadedTempDocs.aadhaar ? window.uploadedTempDocs.aadhaar.fileName : 'doc.pdf', 
                     status: 'In Progress', 
                     currentStage: 'dir_scrutiny',
@@ -1503,7 +1505,7 @@
                 '<span class="px-2.5 py-1 rounded text-xs font-extrabold bg-emerald-100 text-emerald-800 border border-emerald-400">Completed (Approval Disbursed)</span>' :
                 (record.objectionRaised ? 
                 '<span class="px-2 py-0.5 rounded text-xs font-bold bg-amber-100 text-amber-800 border border-amber-300">On Hold</span>' : 
-                '<span class="px-2 py-0.5 rounded text-xs font-bold bg-blue-100 text-blue-800 border border-blue-300">In Process</span>');
+                '<span class="px-2 py-0.5 rounded text-xs font-bold bg-blue-100 text-blue-800 border border-blue-300">In Progress</span>');
 
             box.innerHTML = `
                 <div class="border-b pb-3 mb-3">
@@ -1709,7 +1711,7 @@
             document.getElementById('deptUser').value = document.getElementById('deptSelect').value;
         }
 
-        // DEPT QUEUE RENDERING WITH FLASHING PT REPLIED BADGES
+        // DEPT QUEUE RENDERING WITH APPROVED & FORWARDED SEPARATION LOGIC
         window.loadDeptQueue = function() {
             const db = window.getAppsData();
             const container = document.getElementById('caseQueueList'); 
@@ -1717,9 +1719,14 @@
             container.innerHTML = '';
 
             const searchKey = (document.getElementById('deptSearchInput')?.value || '').trim().toLowerCase();
-            const filterStatus = document.getElementById('deptFilterStatus')?.value || 'ALL';
+            const filterStatus = document.getElementById('deptFilterStatus')?.value || 'IN_PROCESS';
+            const userDept = window.loggedInDeptUser;
 
-            let filtered = db.filter(a => a.currentStage === window.loggedInDeptUser || a.heldByOffice === window.loggedInDeptUser);
+            let filtered = db.filter(a => {
+                const isCurrentlyAtDesk = (a.currentStage === userDept || a.heldByOffice === userDept);
+                const hasPassedThisDesk = (a.passedStages && a.passedStages.includes(userDept));
+                return isCurrentlyAtDesk || hasPassedThisDesk;
+            });
 
             if (searchKey !== '') {
                 filtered = filtered.filter(a => 
@@ -1730,12 +1737,17 @@
                 );
             }
 
-            if (filterStatus === 'HOLD') {
-                filtered = filtered.filter(a => a.objectionRaised === true);
+            if (filterStatus === 'APPROVED_FORWARDED') {
+                filtered = filtered.filter(a => a.passedStages && a.passedStages.includes(userDept) && a.currentStage !== userDept);
+            } else if (filterStatus === 'HOLD') {
+                filtered = filtered.filter(a => a.objectionRaised === true && a.currentStage === userDept);
             } else if (filterStatus === 'REJECTED') {
-                filtered = filtered.filter(a => a.status && a.status.includes('Rejected'));
+                filtered = filtered.filter(a => a.status && a.status.includes('Rejected') && (a.currentStage === userDept || a.passedStages?.includes(userDept)));
             } else if (filterStatus === 'IN_PROCESS') {
-                filtered = filtered.filter(a => !a.objectionRaised && (!a.status || !a.status.includes('Rejected')));
+                filtered = filtered.filter(a => a.currentStage === userDept && !a.objectionRaised && (!a.status || !a.status.includes('Rejected')));
+            } else {
+                // ALL
+                filtered = filtered.filter(a => a.currentStage === userDept || (a.passedStages && a.passedStages.includes(userDept)));
             }
 
             if (!filtered.length) {
@@ -1744,11 +1756,15 @@
 
             filtered.forEach(app => {
                 const card = document.createElement('div');
+                const isForwarded = (app.passedStages && app.passedStages.includes(userDept) && app.currentStage !== userDept);
                 
                 let borderStyle = 'border-l-4 border-l-blue-600 bg-white';
                 let statusBadge = `<span class="text-blue-800 font-bold bg-blue-100 px-1.5 py-0.5 rounded text-[10px]">IN PROCESS</span>`;
 
-                if (app.objectionRaised) {
+                if (isForwarded) {
+                    borderStyle = 'border-l-4 border-l-emerald-600 bg-emerald-50/50';
+                    statusBadge = `<span class="text-emerald-800 font-bold bg-emerald-100 px-1.5 py-0.5 rounded text-[10px]">✓ APPROVED & FORWARDED</span>`;
+                } else if (app.objectionRaised) {
                     borderStyle = 'border-l-4 border-l-amber-500 bg-amber-50/60';
                     statusBadge = `<span class="text-amber-800 font-bold bg-amber-100 px-1.5 py-0.5 rounded text-[10px]">⚠️ ON HOLD</span>`;
                 } else if (app.status && app.status.includes('Rejected')) {
@@ -1757,12 +1773,12 @@
                 }
 
                 let flashRepliedTag = '';
-                if (app.ptRepliedFlash) {
+                if (app.ptRepliedFlash && !isForwarded) {
                     flashRepliedTag = `<span class="bg-amber-500 text-white font-black text-[9px] px-1.5 py-0.5 rounded flash-text uppercase tracking-wider block mt-1">⚡ PT REPLIED / UPDATED</span>`;
                 }
 
                 let newTagHtml = '';
-                if (app.isNewUnread) {
+                if (app.isNewUnread && !isForwarded) {
                     newTagHtml = `<span class="bg-red-600 text-white font-black text-[9px] px-1.5 py-0.5 rounded flash-text uppercase tracking-wider animate-pulse shrink-0">🆕 NEW</span>`;
                 }
 
@@ -1790,7 +1806,7 @@
             if (app) {
                 if (app.isNewUnread || app.ptRepliedFlash) {
                     app.isNewUnread = false;
-                    app.ptRepliedFlash = false; // Reset flash on view
+                    app.ptRepliedFlash = false;
                     if (typeof window.updateAppInCloud === 'function') {
                         window.updateAppInCloud(app.appNo, { isNewUnread: false, ptRepliedFlash: false });
                     }
@@ -1801,8 +1817,17 @@
                 document.getElementById('noCaseSelected').classList.add('hidden-section');
                 document.getElementById('caseViewerArea').classList.remove('hidden-section');
 
+                const isForwardedFromThisDept = (app.passedStages && app.passedStages.includes(window.loggedInDeptUser) && app.currentStage !== window.loggedInDeptUser);
+                const actionControlsBox = document.getElementById('caseActionControlsBox');
+                
+                if (isForwardedFromThisDept) {
+                    actionControlsBox.classList.add('hidden-section');
+                } else {
+                    actionControlsBox.classList.remove('hidden-section');
+                }
+
                 const ptRepliedBox = document.getElementById('vPtRepliedFlashBox');
-                if (app.hasNewFile) {
+                if (app.hasNewFile && !isForwardedFromThisDept) {
                     ptRepliedBox.classList.remove('hidden-section');
                 } else {
                     ptRepliedBox.classList.add('hidden-section');
@@ -1822,7 +1847,10 @@
                 document.getElementById('vBmhrc').innerText = app.bmhrc || 'N/A';
                 
                 const statusBox = document.getElementById('vCurrentStatus');
-                if (app.objectionRaised) {
+                if (isForwardedFromThisDept) {
+                    statusBox.innerText = "Approved & Forwarded";
+                    statusBox.className = "text-[11px] font-bold px-2.5 py-1.5 rounded bg-emerald-100 text-emerald-900 border border-emerald-300 shadow-xs block";
+                } else if (app.objectionRaised) {
                     statusBox.innerText = "On Hold";
                     statusBox.className = "text-[11px] font-bold px-2.5 py-1.5 rounded bg-amber-100 text-amber-900 border border-amber-300 shadow-xs block";
                 } else {
@@ -1899,7 +1927,7 @@
             }
         }
 
-        // WORKFLOW ACTION PROCESSING WITH WELFARE COMMISSIONER FINAL COMPLETED APPROVAL
+        // WORKFLOW ACTION PROCESSING WITH PASSED STAGES REGISTRATION
         async function processCaseAction(decision) {
             if (!selectedApplicationId) return;
             const remarks = document.getElementById('deptRemarks').value.trim();
@@ -1917,6 +1945,8 @@
             const db = window.getAppsData();
             const app = db.find(a => a.appNo === selectedApplicationId);
             const creds = JSON.parse(localStorage.getItem('dept_db'));
+
+            if (!app.passedStages) app.passedStages = [];
 
             if (decision === 'REJECTED') {
                 app.status = 'Rejected / Discrepancy Found'; 
@@ -1936,13 +1966,18 @@
                 app.ptRepliedFlash = false;
                 app.status = 'In Progress';
                 const oldStage = app.currentStage;
+
+                // Register current stage as passed stage
+                if (!app.passedStages.includes(oldStage)) {
+                    app.passedStages.push(oldStage);
+                }
                 
                 if (app.currentStage === 'dir_scrutiny') { app.currentStage = (app.ailment === 'Kidney') ? 'hosp_kidney' : 'hosp_pulmo'; }
                 else if (app.currentStage === 'hosp_kidney' || app.currentStage === 'hosp_pulmo') { app.currentStage = 'dir_compile'; }
                 else if (app.currentStage === 'dir_compile') { app.currentStage = 'welfare_comm'; }
                 else if (app.currentStage === 'welfare_comm') { 
                     app.currentStage = 'completed_disbursed'; 
-                    app.status = 'Completed'; // Set Completed after Welfare Commissioner Approval
+                    app.status = 'Completed';
                 }
                 
                 if (oldStage === 'dir_compile') {
@@ -2014,7 +2049,7 @@
             let records = db.filter(a => {
                 let t = a.createdTimestamp || new Date(a.receivedDate).getTime() || Date.now();
                 let matchesTime = t >= fromTime && t <= toTime;
-                let matchesDept = deptFilterKey ? (a.currentStage === deptFilterKey || a.heldByOffice === deptFilterKey) : true;
+                let matchesDept = deptFilterKey ? (a.currentStage === deptFilterKey || a.heldByOffice === deptFilterKey || (a.passedStages && a.passedStages.includes(deptFilterKey))) : true;
                 return matchesTime && matchesDept;
             });
 
