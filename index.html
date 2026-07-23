@@ -7,7 +7,7 @@
     <!-- Tailwind CSS for Modern UI -->
     <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
     <style>
-        .hidden-section { display: none !important; }
+        .hidden-section { display: none; }
         
         /* Flash/Blinking Animation */
         @keyframes flashEffect {
@@ -15,7 +15,7 @@
             50% { opacity: 0.3; }
         }
         .flash-text {
-            animation: flashEffect 2s infinite;
+            animation: flashEffect 1.5s infinite;
         }
 
         /* Continuous Tiled Grid Background Setup (4 Images Per Row) */
@@ -69,6 +69,12 @@
         .news-scroll-container:hover .news-scroll-content {
             animation-play-state: paused;
         }
+
+        @media print {
+            body * { visibility: hidden; }
+            #misReportPrintArea, #misReportPrintArea * { visibility: visible; }
+            #misReportPrintArea { position: absolute; left: 0; top: 0; width: 100%; }
+        }
     </style>
 </head>
 <body class="bg-gray-50 font-sans text-gray-800 min-h-screen flex flex-col justify-between relative">
@@ -78,10 +84,6 @@
     <div class="dept-text-watermark select-none">
         Bhopal Gas Tragedy Relief & Rehabilitation Department<br>Bhopal Gas Tragedy Relief & Rehabilitation Department
     </div>
-
-    <!-- Firebase Recaptcha Invisible Containers -->
-    <div id="recaptcha-container-form"></div>
-    <div id="recaptcha-container-status"></div>
 
     <!-- TOP FLASHING HELPLINE BANNER -->
     <div class="bg-red-600 text-white text-center py-2 px-4 text-xs md:text-sm font-bold shadow-inner z-10">
@@ -174,7 +176,7 @@
                                 </div>
                             </div>
 
-                            <!-- 6. ANTIM AADESH WARD NO. SELECTION -->
+                            <!-- 6. ANTIM AADESH WARD NO. SELECTION (1 TO 50 DROPDOWN) -->
                             <div>
                                 <label class="block text-sm font-bold text-blue-900 mb-1">Antim Aadesh Ward No. (अंतिम आदेश पर अंकित वार्ड क्र. 1 से 50) *</label>
                                 <select id="pWardNo" required class="w-full p-2 border rounded bg-white font-semibold text-sm">
@@ -187,30 +189,31 @@
                                 </select>
                             </div>
                             
-                            <!-- 7. MOBILE NUMBER WITH FIREBASE SMS OTP VERIFICATION -->
+                            <!-- 7. MOBILE NUMBER WITH CAPTCHA VERIFICATION -->
                             <div>
                                 <label id="lblMobileNumber" class="block text-sm font-medium mb-1">Mobile Number *</label>
-                                <div class="flex gap-2">
-                                    <input type="text" id="pMobile" maxlength="10" required placeholder="10-digit mobile number" class="w-full p-2 border rounded bg-white font-mono">
-                                    <button type="button" id="btnSendFormOtp" onclick="sendFormMobileOTP()" class="bg-blue-800 hover:bg-blue-700 text-white text-xs font-bold px-4 py-2 rounded shrink-0 shadow transition">📱 Send OTP</button>
-                                </div>
+                                <input type="text" id="pMobile" maxlength="10" required placeholder="10-digit number" class="w-full p-2 border rounded bg-white">
                                 <span class="text-xs font-bold text-red-600 mt-1 block flash-text">
                                     📢 Mobile Number must be Aadhaar linked only / मोबाइल नंबर आधार से लिंक होना अनिवार्य है।
                                 </span>
                                 
-                                <div id="formOtpSection" class="bg-blue-50/80 p-3 rounded border border-blue-300 mt-2 hidden-section">
-                                    <label class="block text-xs font-bold text-blue-900 uppercase mb-1">Enter 6-Digit SMS OTP Received on Mobile *</label>
-                                    <div class="flex gap-2 items-center">
-                                        <input type="text" id="formOtpInput" maxlength="6" placeholder="Enter 6-digit OTP" class="text-xs p-2 border border-blue-300 bg-white rounded max-w-xs focus:outline-none font-mono tracking-widest text-base">
-                                        <button type="button" id="btnVerifyFormOtp" onclick="verifyFormMobileOTP()" class="bg-emerald-700 hover:bg-emerald-800 text-white text-xs font-bold px-4 py-2 rounded cursor-pointer shadow-sm transition">✓ Verify OTP</button>
+                                <div class="bg-blue-50/70 p-3 rounded border border-blue-200 mt-2">
+                                    <label class="block text-xs font-bold text-blue-900 uppercase mb-1">Mobile Verification CAPTCHA *</label>
+                                    <div class="flex flex-col sm:flex-row gap-2 items-start sm:items-center">
+                                        <div class="flex items-center gap-1">
+                                            <span id="mobileCaptchaCode" class="bg-zinc-800 text-yellow-400 font-mono font-bold px-3 py-1 rounded select-none line-through tracking-widest text-sm"></span>
+                                            <button type="button" onclick="generateMobileCaptcha()" class="text-[10px] text-blue-600 underline">Refresh</button>
+                                        </div>
+                                        <input type="text" id="mobileCaptchaInput" placeholder="Enter CAPTCHA" class="text-xs p-2 border border-blue-300 bg-white rounded max-w-xs focus:outline-none font-mono">
+                                        <button type="button" id="btnVerifyMobileCaptcha" onclick="verifyMobileCaptcha()" class="bg-blue-700 hover:bg-blue-800 text-white text-[11px] font-bold px-4 py-2 rounded cursor-pointer shadow-sm transition">✓ Verify Mobile CAPTCHA</button>
+                                        <span id="mobileCaptchaStatus" class="text-xs font-bold text-red-600 block sm:inline">Status: Unverified</span>
                                     </div>
-                                    <span id="formOtpStatus" class="text-xs font-bold text-amber-700 mt-1 block">Status: OTP Sent to your Mobile</span>
                                 </div>
                             </div>
 
                             <div>
                                 <label id="lblAadhaarNumber" class="block text-sm font-medium mb-1">Aadhaar Number *</label>
-                                <input type="password" id="pAadhaar" maxlength="12" required placeholder="Enter Aadhaar" class="w-full p-2 border rounded bg-white font-mono">
+                                <input type="password" id="pAadhaar" maxlength="12" required placeholder="Enter Aadhaar" class="w-full p-2 border rounded bg-white">
                             </div>
 
                             <div>
@@ -230,10 +233,10 @@
 
                             <div>
                                 <label id="lblBmhrcCard" class="block text-sm font-medium mb-1">BMHRC Card Number (8 Digit)</label>
-                                <input type="text" id="pBmhrc" maxlength="8" placeholder="Enter 8-digit BMHRC card number (Optional)" class="w-full p-2 border rounded bg-white font-mono">
+                                <input type="text" id="pBmhrc" maxlength="8" placeholder="Enter 8-digit BMHRC card number (Optional)" class="w-full p-2 border rounded bg-white">
                             </div>
                             
-                            <!-- Mandatory Upload File Options -->
+                            <!-- Mandatory Upload File Options (With Individual Upload Buttons & 500 KB Limit) -->
                             <div class="border-t border-b py-3 my-2 space-y-3 bg-blue-50/50 p-3 rounded">
                                 <span class="block text-xs font-bold text-blue-900 uppercase">Mandatory Documents Upload (Max 500 KB per PDF) *</span>
                                 
@@ -324,7 +327,7 @@
                                     <span id="captchaCode" class="bg-zinc-800 text-yellow-400 font-mono font-bold px-3 py-1 rounded select-none line-through tracking-widest text-lg"></span>
                                     <button type="button" id="btnRefreshCaptcha" onclick="generateCaptcha()" class="text-xs text-blue-600 ml-2 underline">Refresh</button>
                                 </div>
-                                <input type="text" id="captchaInput" placeholder="Captcha" required class="w-32 p-1 text-center border rounded bg-white font-mono">
+                                <input type="text" id="captchaInput" placeholder="Captcha" required class="w-32 p-1 text-center border rounded bg-white">
                             </div>
 
                             <!-- Declaration / Agree Checkbox -->
@@ -362,8 +365,50 @@
                         </span>
                     </div>
 
+                    <!-- Extended Height Auto Scroll Container -->
                     <div class="news-scroll-container">
                         <div class="news-scroll-content">
+                            
+                            <div class="p-3.5 bg-red-50 border-l-4 border-red-600 rounded shadow-xs shrink-0">
+                                <span class="bg-red-600 text-white text-xs font-bold px-2 py-0.5 rounded flash-text uppercase">IMPORTANT MANDATORY RULE</span>
+                                <p class="text-sm font-bold text-red-950 mt-1">Aadhaar Linked Mobile Mandatory</p>
+                                <p class="text-xs text-gray-800 mt-1 leading-relaxed font-semibold">
+                                    Office of Welfare Commissioner, Gas Rahat Bhopal द्वारा आवेदक को आधार से लिंक मोबाइल नंबर देना अनिवार्य है।
+                                </p>
+                                <span class="text-[10px] text-gray-500 font-mono block mt-1">July 2026</span>
+                            </div>
+
+                            <div class="p-3.5 bg-indigo-50 border-l-4 border-indigo-600 rounded shadow-xs shrink-0">
+                                <span class="bg-indigo-800 text-white text-xs font-bold px-2 py-0.5 rounded uppercase">CRITICAL GUIDELINE</span>
+                                <p class="text-sm font-bold text-indigo-950 mt-1">Father/Spouse Name Requirement</p>
+                                <p class="text-xs text-gray-800 mt-1 leading-relaxed font-semibold">
+                                    मेडिकल जांच रिपोर्ट (Diagnostic Reports) में पिता/पति (Father/Spouse) का नाम अंकित होना अनिवार्य है।
+                                </p>
+                                <span class="text-[10px] text-gray-500 font-mono block mt-1">July 2026</span>
+                            </div>
+
+                            <div class="p-3.5 bg-amber-50 border-l-4 border-amber-500 rounded shadow-xs shrink-0">
+                                <span class="bg-amber-600 text-white text-xs font-bold px-2 py-0.5 rounded uppercase">WARD NO & SAMAGRA ID</span>
+                                <p class="text-sm font-bold text-amber-950 mt-1">अंतिम आदेश वार्ड क्र. एवं समग्र आईडी अनिवार्य</p>
+                                <p class="text-xs text-gray-800 mt-1 leading-relaxed font-semibold">
+                                    आवेदन में अंतिम आदेश का वार्ड क्र. (1 से 50) एवं Claimant की परिवार व सदस्य समग्र आईडी दर्ज करना अनिवार्य है।
+                                </p>
+                            </div>
+
+                            <div class="p-3.5 bg-blue-50 border-l-4 border-blue-600 rounded shadow-xs shrink-0">
+                                <span class="bg-blue-800 text-white text-xs font-bold px-2 py-0.5 rounded uppercase">DOCUMENTATION</span>
+                                <p class="text-sm font-bold text-blue-950 mt-1">आवश्यक दस्तावेज़ों की सूची:</p>
+                                <ul class="text-xs text-gray-800 mt-1 space-y-1 list-disc pl-4 font-semibold">
+                                    <li>1. Aadhaar Card (आधार कार्ड)</li>
+                                    <li>2. Medical History / Diagnostic Reports</li>
+                                    <li>3. Antim Aadesh (अंतिम आदेश)</li>
+                                    <li>4. Pro Rata Document (प्रो राटा)</li>
+                                    <li>5. Any Other Supportive Document</li>
+                                    <li>6. Death Certificate (यदि लागू हो)</li>
+                                </ul>
+                            </div>
+
+                            <!-- DUPLICATED LOOP ITEMS -->
                             <div class="p-3.5 bg-red-50 border-l-4 border-red-600 rounded shadow-xs shrink-0">
                                 <span class="bg-red-600 text-white text-xs font-bold px-2 py-0.5 rounded flash-text uppercase">IMPORTANT MANDATORY RULE</span>
                                 <p class="text-sm font-bold text-red-950 mt-1">Aadhaar Linked Mobile Mandatory</p>
@@ -376,15 +421,7 @@
                                 <span class="bg-indigo-800 text-white text-xs font-bold px-2 py-0.5 rounded uppercase">CRITICAL GUIDELINE</span>
                                 <p class="text-sm font-bold text-indigo-950 mt-1">Father/Spouse Name Requirement</p>
                                 <p class="text-xs text-gray-800 mt-1 leading-relaxed font-semibold">
-                                    मेडिकल जांच रिपोर्ट (Diagnostic Reports) में पिता/पति का नाम अंकित होना अनिवार्य है।
-                                </p>
-                            </div>
-
-                            <div class="p-3.5 bg-amber-50 border-l-4 border-amber-500 rounded shadow-xs shrink-0">
-                                <span class="bg-amber-600 text-white text-xs font-bold px-2 py-0.5 rounded uppercase">SECURITY UPDATE</span>
-                                <p class="text-sm font-bold text-amber-950 mt-1">OTP Mobile Authentication Enforced</p>
-                                <p class="text-xs text-gray-800 mt-1 leading-relaxed font-semibold">
-                                    अब फॉर्म सबमिशन एवं स्टेटस चेक दोनों ही मामलों में मोबाइल नंबर पर OTP सत्यापन अनिवार्य कर दिया गया है।
+                                    मेडिकल जांच रिपोर्ट (Diagnostic Reports) में पिता/पति (Father/Spouse) का नाम अंकित होना अनिवार्य है।
                                 </p>
                             </div>
                         </div>
@@ -393,40 +430,19 @@
             </div>
         </section>
 
-        <!-- ================= SECURE STATUS TRACKER (WITH MOBILE OTP LOCK) ================= -->
+        <!-- ================= STATUS TRACKER ================= -->
         <section id="status-portal" class="hidden-section bg-white/95 p-6 rounded-lg shadow-md max-w-2xl mx-auto mt-6 border border-gray-100">
-            <h2 id="statusPortalHeading" class="text-2xl font-semibold border-b pb-2 mb-4 text-blue-900">Track Application Status (Secure Access)</h2>
+            <h2 id="statusPortalHeading" class="text-2xl font-semibold border-b pb-2 mb-4 text-blue-900">Track Application Status</h2>
             <div class="space-y-4">
-                
-                <!-- STEP 1: Application Number Search -->
                 <div>
-                    <label id="lblSearchHelp" class="block text-sm font-medium mb-1">Step 1: Enter Application No. / Mobile / Aadhaar</label>
+                    <label id="lblSearchHelp" class="block text-sm font-medium mb-1">Search by Application No. / Mobile / Aadhaar</label>
                     <div class="flex gap-2">
-                        <input type="text" id="searchKey" placeholder="Enter BGT Application No. or Mobile..." class="w-full p-2 border rounded bg-white font-mono">
-                        <button id="btnSearch" onclick="initiateStatusCheck()" class="bg-blue-800 hover:bg-blue-700 text-white px-6 py-2 rounded font-bold cursor-pointer shrink-0">Find Record</button>
+                        <input type="text" id="searchKey" placeholder="..." class="w-full p-2 border rounded bg-white">
+                        <button id="btnSearch" onclick="trackApplication()" class="bg-blue-800 hover:bg-blue-700 text-white px-6 py-2 rounded font-bold cursor-pointer">Search</button>
                     </div>
                 </div>
-
-                <!-- STEP 2: Mobile OTP Verification Box for Confidentiality -->
-                <div id="statusOtpBox" class="hidden-section bg-amber-50/90 border-2 border-amber-400 p-4 rounded-lg space-y-3">
-                    <p class="text-xs font-bold text-amber-950 uppercase tracking-wide">
-                        🔐 Security Lock: Verify Mobile OTP to Access Confidential Documents & Status
-                    </p>
-                    <p class="text-xs text-gray-700">
-                        Record matched for Mobile: <strong id="statusMaskedMobile" class="font-mono text-blue-900"></strong>. Click below to receive SMS OTP.
-                    </p>
-                    
-                    <div class="flex flex-col sm:flex-row gap-2">
-                        <button type="button" id="btnSendStatusOtp" onclick="sendStatusMobileOTP()" class="bg-amber-600 hover:bg-amber-700 text-white text-xs font-bold px-4 py-2 rounded shadow shrink-0">📱 Bhejo Mobile OTP</button>
-                        <input type="text" id="statusOtpInput" maxlength="6" placeholder="Enter 6-digit SMS OTP" class="p-2 border border-amber-300 rounded text-xs font-mono tracking-widest bg-white">
-                        <button type="button" id="btnVerifyStatusOtp" onclick="verifyStatusMobileOTP()" class="bg-emerald-700 hover:bg-emerald-800 text-white text-xs font-bold px-4 py-2 rounded shadow shrink-0">✓ Verify OTP & View Status</button>
-                    </div>
-                    <span id="statusOtpMsg" class="text-xs font-bold text-blue-900 block"></span>
-                </div>
-
-                <!-- STEP 3: Protected Details Result Box -->
                 <div id="statusResult" class="mt-4 p-4 bg-gray-50 rounded border hidden-section">
-                    <!-- Dynamic details injection after OTP verification -->
+                    <!-- Dynamic details injection -->
                 </div>
             </div>
         </section>
@@ -449,7 +465,7 @@
                 </div>
                 <div>
                     <label id="lblUsername" class="block text-sm font-medium">Username / Login ID</label>
-                    <input type="text" id="deptUser" readonly required class="w-full p-2 border bg-gray-100 rounded text-sm font-mono">
+                    <input type="text" id="deptUser" readonly required class="w-full p-2 border bg-gray-100 rounded text-sm">
                 </div>
                 <div>
                     <label id="lblPassword" class="block text-sm font-medium">Password</label>
@@ -459,7 +475,7 @@
             </form>
         </section>
 
-        <!-- ================= DIRECTOR ADMIN LIVE WORKSPACE WITH MIS REPORT GENERATOR ================= -->
+        <!-- ================= DIRECTOR ADMIN LIVE WORKSPACE ================= -->
         <section id="director-workspace" class="hidden-section mt-4">
             <div class="bg-blue-950 text-white p-4 rounded-t-lg flex justify-between items-center">
                 <div>
@@ -483,7 +499,7 @@
                             <p id="dashProcess" class="text-2xl font-bold text-amber-600">0</p>
                         </div>
                         <div class="p-3 bg-emerald-50 rounded border border-emerald-200">
-                            <p class="text-xs text-gray-500 font-semibold uppercase">Completed (Disbursed)</p>
+                            <p class="text-xs text-gray-500 font-semibold uppercase">Completed (Welfare Comm Approved)</p>
                             <p id="dashAccepted" class="text-2xl font-bold text-emerald-600">0</p>
                         </div>
                         <div class="p-3 bg-red-50 rounded border border-red-200">
@@ -493,46 +509,34 @@
                     </div>
                 </div>
 
-                <!-- NEW FEATURE: DIRECTOR ADMIN LEVEL MIS REPORT GENERATOR -->
-                <div class="bg-indigo-50/70 p-4 border-2 border-indigo-200 rounded-lg space-y-3">
-                    <div class="flex justify-between items-center border-b border-indigo-200 pb-2">
-                        <h3 class="font-bold text-indigo-950 text-sm uppercase tracking-wide flex items-center gap-2">
-                            <span>📊</span> Directorate MIS Summary & Periodical Audit Report
-                        </h3>
-                        <button onclick="printMisReport()" class="bg-indigo-800 hover:bg-indigo-700 text-white text-xs font-bold px-3 py-1.5 rounded shadow cursor-pointer">🖨️ Print / Export PDF</button>
-                    </div>
-
-                    <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-3 text-xs">
+                <!-- DIRECTOR ADMIN MIS REPORT GENERATOR SECTION -->
+                <div class="bg-amber-50/60 p-4 border border-amber-300 rounded-lg shadow-xs">
+                    <h3 class="font-bold text-amber-950 mb-2 text-sm uppercase tracking-wide flex items-center gap-2">
+                        <span>📊</span> Generate Periodical MIS Executive Summary Report (Daily / Weekly / Custom Period)
+                    </h3>
+                    <div class="grid grid-cols-1 md:grid-cols-4 gap-3 items-end">
                         <div>
-                            <label class="block font-bold text-gray-700 mb-1">Select Period / Periodicity:</label>
-                            <select id="misPeriodSelect" onchange="generateMisReport()" class="w-full p-2 border rounded bg-white font-semibold">
-                                <option value="ALL">All Time Cumulative</option>
-                                <option value="TODAY">Daily (Today's Inflow)</option>
-                                <option value="WEEKLY">Weekly (Last 7 Days)</option>
-                                <option value="CUSTOM">Custom Date Range</option>
-                            </select>
-                        </div>
-                        <div id="misDateStartBox" class="hidden-section">
-                            <label class="block font-bold text-gray-700 mb-1">From Date:</label>
-                            <input type="date" id="misStartDate" onchange="generateMisReport()" class="w-full p-1.5 border rounded bg-white">
-                        </div>
-                        <div id="misDateEndBox" class="hidden-section">
-                            <label class="block font-bold text-gray-700 mb-1">To Date:</label>
-                            <input type="date" id="misEndDate" onchange="generateMisReport()" class="w-full p-1.5 border rounded bg-white">
+                            <label class="block text-xs font-bold text-gray-700 mb-1">From Date (शुरुआती तारीख):</label>
+                            <input type="date" id="dMisFromDate" class="w-full text-xs p-2 border rounded bg-white">
                         </div>
                         <div>
-                            <label class="block font-bold text-gray-700 mb-1">Filter Ailment Category:</label>
-                            <select id="misAilmentFilter" onchange="generateMisReport()" class="w-full p-2 border rounded bg-white font-semibold">
-                                <option value="ALL">All Ailments (Kidney & Cancer)</option>
-                                <option value="Kidney">Kidney Ailment</option>
-                                <option value="Cancer/Pulmonary">Cancer / Pulmonary</option>
+                            <label class="block text-xs font-bold text-gray-700 mb-1">To Date (अंतिम तारीख):</label>
+                            <input type="date" id="dMisToDate" class="w-full text-xs p-2 border rounded bg-white">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-bold text-gray-700 mb-1">Filter Period Preset:</label>
+                            <select id="dMisPreset" onchange="applyMisPreset('dMisFromDate', 'dMisToDate', this.value)" class="w-full text-xs p-2 border rounded bg-white font-semibold">
+                                <option value="CUSTOM">Custom Range</option>
+                                <option value="TODAY">Today (दैनिक)</option>
+                                <option value="WEEK">Last 7 Days (साप्ताहिक)</option>
+                                <option value="MONTH">This Month (मासिक)</option>
                             </select>
                         </div>
-                    </div>
-
-                    <!-- Generated MIS Report Dynamic Output -->
-                    <div id="misReportContainer" class="bg-white p-3 border rounded shadow-inner text-xs space-y-2">
-                        <!-- Loaded dynamically via JS -->
+                        <div>
+                            <button onclick="generateDirectorMisReport()" class="w-full bg-blue-900 hover:bg-blue-800 text-white font-bold text-xs py-2 rounded shadow transition cursor-pointer">
+                                📈 Generate MIS Report
+                            </button>
+                        </div>
                     </div>
                 </div>
 
@@ -609,6 +613,7 @@
                 <div class="lg:col-span-1 border-r pr-4 space-y-3">
                     <h3 id="lblInboundApp" class="font-bold text-gray-700 pb-1 border-b">Inbound Applications Queue</h3>
                     
+                    <!-- DEPARTMENT SEARCH & FILTER INTERFACE + MIS REPORT BUTTON -->
                     <div class="bg-blue-50 p-2.5 rounded border border-blue-200 space-y-2">
                         <div>
                             <label class="block text-[10px] font-bold text-blue-900 uppercase">🔍 Quick Search Patient / Claimant:</label>
@@ -623,6 +628,27 @@
                                 <option value="REJECTED">❌ Rejected Files</option>
                             </select>
                         </div>
+
+                        <!-- DEPARTMENT USER MIS REPORT GENERATOR -->
+                        <div class="border-t border-blue-200 pt-2 mt-2">
+                            <button onclick="toggleDeptMisPanel()" class="w-full bg-emerald-700 hover:bg-emerald-800 text-white font-bold text-xs py-1.5 rounded shadow transition cursor-pointer">
+                                📊 Generate Dept Desk MIS Report
+                            </button>
+                            <div id="deptMisPanel" class="hidden-section mt-2 p-2 bg-white rounded border border-emerald-300 space-y-2">
+                                <span class="text-[10px] font-bold text-emerald-900 uppercase block">Select Period for Desk MIS:</span>
+                                <div class="grid grid-cols-2 gap-1">
+                                    <input type="date" id="deptMisFrom" class="text-[10px] p-1 border rounded">
+                                    <input type="date" id="deptMisTo" class="text-[10px] p-1 border rounded">
+                                </div>
+                                <select id="deptMisPreset" onchange="applyMisPreset('deptMisFrom', 'deptMisTo', this.value)" class="w-full text-[10px] p-1 border rounded bg-gray-50">
+                                    <option value="CUSTOM">Custom Period</option>
+                                    <option value="TODAY">Today</option>
+                                    <option value="WEEK">Last 7 Days</option>
+                                    <option value="MONTH">This Month</option>
+                                </select>
+                                <button onclick="generateDeptUserMisReport()" class="w-full bg-blue-900 text-white font-bold text-[10px] py-1 rounded">Generate & Print Report</button>
+                            </div>
+                        </div>
                     </div>
 
                     <div class="overflow-y-auto max-h-96 space-y-2" id="caseQueueList"></div>
@@ -635,6 +661,7 @@
                     </div>
                     
                     <div id="caseViewerArea" class="hidden-section space-y-4">
+                        <!-- TOP PATIENT DETAILS DISPLAY BOX IN DEPARTMENT VIEW -->
                         <div class="bg-blue-50 p-4 rounded-lg border-2 border-blue-200 flex justify-between items-start shadow-sm">
                             <div class="space-y-1">
                                 <p class="text-xs font-bold text-amber-900 bg-amber-100 px-2 py-0.5 rounded inline-block border border-amber-300">
@@ -663,14 +690,21 @@
                             </div>
                         </div>
 
+                        <!-- FLASH NOTIFICATION WHEN PT HAS REPLIED / UPDATED -->
+                        <div id="vPtRepliedFlashBox" class="hidden-section bg-amber-100 border-2 border-amber-500 p-3 rounded text-amber-950 shadow-md">
+                            <span class="bg-amber-600 text-white font-black text-xs px-2 py-0.5 rounded flash-text uppercase inline-block">⚡ PT REPLIED / UPDATED</span>
+                            <p class="text-xs font-bold mt-1">The patient has re-uploaded the requested corrected document and response. Please inspect below.</p>
+                        </div>
+
                         <!-- ALL PATIENT SUBMITTED DOCUMENTS VERIFICATION PANEL -->
                         <div class="bg-gray-50 p-3 rounded border border-gray-300">
                             <label class="block text-xs font-bold text-gray-800 uppercase tracking-wide mb-2 border-b pb-1">
-                                1. Patient Uploaded Documents Verification Panel (آवेदक के सभी दस्तावेज़)
+                                1. Patient Uploaded Documents Verification Panel (आवेदक के सभी दस्तावेज़ - Accessible Anywhere)
                             </label>
                             
                             <div id="ptDocAccessGrid" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-2 mt-2"></div>
 
+                            <!-- Re-uploaded file section -->
                             <div id="vNewFileContainer" class="mt-3 bg-emerald-50 p-2.5 border-2 border-emerald-400 rounded flex items-center justify-between hidden-section shadow-sm">
                                 <div>
                                     <span class="text-[10px] font-bold text-emerald-900 uppercase block">✓ RE-UPLOADED / CORRECTED DOCUMENT RECEIVED:</span>
@@ -702,6 +736,7 @@
                                 </div>
                             </div>
 
+                            <!-- DEPARTMENT CAPTCHA VERIFICATION INTERFACE -->
                             <div class="mb-4 p-3 bg-amber-50 border border-amber-300 rounded shadow-xs">
                                 <label class="block text-[11px] font-bold text-amber-900 uppercase mb-1">B. Department Security CAPTCHA Verification *:</label>
                                 <div class="flex flex-col sm:flex-row gap-2 items-start sm:items-center">
@@ -736,6 +771,30 @@
 
     </div>
 
+    <!-- MIS REPORT PRINT CONTAINER MODAL -->
+    <div id="misReportModal" class="hidden-section fixed inset-0 bg-black/70 backdrop-blur-xs flex justify-center items-center p-4 z-50 overflow-y-auto">
+        <div class="bg-white rounded-lg p-6 max-w-4xl w-full shadow-2xl border my-8">
+            <div class="flex justify-between items-center border-b pb-3 mb-4">
+                <h3 class="text-lg font-bold text-blue-900 uppercase">📊 Generated Executive MIS Report</h3>
+                <button onclick="closeMisReportModal()" class="text-red-600 font-bold text-lg hover:text-red-800">&times; Close</button>
+            </div>
+            <div id="misReportPrintArea" class="space-y-4 p-2 bg-white">
+                <div class="text-center border-b pb-3">
+                    <h2 class="text-lg font-bold text-blue-950 uppercase">Bhopal Gas Tragedy Relief & Rehabilitation Department, M.P.</h2>
+                    <h3 class="text-md font-bold text-amber-600" id="misReportDeskTitle">MIS Executive Processing Summary</h3>
+                    <p class="text-xs text-gray-600 font-mono" id="misReportDateRange"></p>
+                </div>
+                <div id="misReportTableWrapper" class="overflow-x-auto">
+                    <!-- Dynamic Table Injection -->
+                </div>
+            </div>
+            <div class="border-t pt-3 mt-4 flex justify-end gap-3">
+                <button onclick="closeMisReportModal()" class="bg-gray-500 text-white px-4 py-1.5 rounded text-xs font-bold">Cancel</button>
+                <button onclick="window.print()" class="bg-blue-900 text-white px-5 py-1.5 rounded text-xs font-bold">🖨️ Print / Save PDF</button>
+            </div>
+        </div>
+    </div>
+
     <!-- FOOTER -->
     <footer class="bg-blue-950 text-white pt-6 pb-4 border-t-2 border-amber-500 mt-8 z-10">
         <div class="container mx-auto px-4 text-center space-y-3">
@@ -756,10 +815,9 @@
         </div>
     </footer>
 
-    <!-- ================= FIREBASE AUTH, REALTIME ENGINE & CLOUD FIRESTORE DATA MODULE ================= -->
+    <!-- ================= FIREBASE REALTIME ENGINE & CLOUD FIRESTORE DATA MODULE ================= -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-        import { getAuth, RecaptchaVerifier, signInWithPhoneNumber } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
         import { getFirestore, collection, updateDoc, doc, onSnapshot, setDoc, getDoc, increment } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
         const firebaseConfig = {
@@ -773,15 +831,9 @@
         };
 
         const app = initializeApp(firebaseConfig);
-        const auth = getAuth(app);
         const db = getFirestore(app);
 
-        // Make Auth globally accessible for plain JS calls
-        window.firebaseAuth = auth;
-        window.RecaptchaVerifier = RecaptchaVerifier;
-        window.signInWithPhoneNumber = signInWithPhoneNumber;
-
-        // Visitor Counter
+        // Fail-safe Global Visitor Counter (Self-healing document creation)
         window.initVisitorCounter = function() {
             const counterRef = doc(db, "site_stats", "counter");
             if (!sessionStorage.getItem('visited_session_counter')) {
@@ -801,6 +853,7 @@
             });
         };
 
+        // Self-Healing Cloud Save Architecture
         window.saveAppToCloud = async function(appData, ptDocs) {
             try {
                 const mainData = { ...appData };
@@ -842,7 +895,7 @@
                 await setDoc(doc(db, "applications", appNo, "files", fileKey), fileData, { merge: true });
                 return true;
             } catch (e) {
-                console.error("Error saving file: ", e);
+                console.error("Error saving file to subcollection: ", e);
                 return false;
             }
         };
@@ -854,7 +907,7 @@
                     return snap.data().url;
                 }
             } catch (e) {
-                console.error("Error fetching file: ", e);
+                console.error("Error fetching file from subcollection: ", e);
             }
             return null;
         };
@@ -870,6 +923,7 @@
             }
         };
 
+        // Real-Time Sync Engine across all PCs
         window.listenToCloudData = function() {
             onSnapshot(collection(db, "applications"), (snapshot) => {
                 const cloudApps = [];
@@ -884,8 +938,6 @@
                 } catch(e) {}
                 
                 if (typeof window.updateDashboard === 'function') window.updateDashboard();
-                if (typeof window.generateMisReport === 'function') window.generateMisReport();
-
                 if (window.loggedInDeptUser === 'director_admin') {
                     if (typeof window.loadDirectorDashboard === 'function') window.loadDirectorDashboard();
                 } else if (window.loggedInDeptUser) {
@@ -902,14 +954,9 @@
     <script>
         let currentLang = 'en';
         let isCurrentSessionDeptVerified = false;
-        let isFormMobileOtpVerified = false;
-        let isStatusMobileOtpVerified = false;
-
-        let formConfirmationResult = null;
-        let statusConfirmationResult = null;
-        let pendingStatusRecord = null;
-
+        let isMobileCaptchaVerified = false;
         let currentDeptCaptcha = '';
+        let currentMobileCaptcha = '';
         window.loggedInDeptUser = null;
         window.uploadedTempDocs = {};
 
@@ -939,8 +986,8 @@
                 lblCaptcha: "Security CAPTCHA:", btnRefreshCaptcha: "Refresh", captchaInput_placeholder: "Enter Captcha",
                 btnSubmitApp: "Submit Application", lblSuccessTitle: "✓ Application Submitted Successfully!",
                 lblAppNumberText: "Your unique Application Number is:", lblSuccessNote: "Kindly note this down to track your live status.",
-                statusPortalHeading: "Track Application Status (Secure Access)", lblSearchHelp: "Step 1: Enter Application No. / Mobile / Aadhaar",
-                searchKey_placeholder: "Enter details...", btnSearch: "Find Record",
+                statusPortalHeading: "Track Application Status", lblSearchHelp: "Search by Application No. / Mobile / Aadhaar",
+                searchKey_placeholder: "Enter details...", btnSearch: "Search",
                 deptLoginHeading: "Department Dashboard Secure Sign-In", lblSelectDept: "Select Department *",
                 optChooseDept: "-- Choose Department --", optDept1: "Directorate Gas Relief (Initial Scrutiny)",
                 optDept2: "Kamla Nehru Hospital (Kidney Verification)", optDept3: "Medical Verification Board (Cancer/Pulmonary)",
@@ -949,6 +996,7 @@
                 lblUsername: "Username / Login ID", lblPassword: "Password", deptPass_placeholder: "Enter Password",
                 btnDeptLogin: "Login", lblActiveWorkspace: "Active Workspace:", btnLogout: "Logout",
                 lblInboundApp: "Inbound Applications Queue", noCaseSelected: "Select an application from the side panel to review details and documents.",
+                lblViewerApplicant: "Applicant Name:",
                 lblFooterCredit: "Website Developed and maintained By - Bhopal Gas Tragedy Relief & Rehabilitation Department, Bhopal, Govt. Of Madhya Pradesh",
                 lblVisitorText: "Total Visits / कुल आगंतुक:"
             },
@@ -964,8 +1012,8 @@
                 lblCaptcha: "सुरक्षा कैप्चा:", btnRefreshCaptcha: "रिफ्रेश", captchaInput_placeholder: "कैप्चा कोड भरें",
                 btnSubmitApp: "आवेदन जमा करें", lblSuccessTitle: "✓ आवेदन सफलतापूर्वक जमा हो गया है!",
                 lblAppNumberText: "आपका विशिष्ट आवेदन नंबर है:", lblSuccessNote: "कृपया लाइव स्थिति ट्रैक करने के लिए इसे नोट कर लें।",
-                statusPortalHeading: "आवेदन की स्थिति ट्रैक करें (सुरक्षित पहुँच)", lblSearchHelp: "चरण 1: आवेदन संख्या / मोबाइल नंबर / आधार द्वारा खोजें",
-                searchKey_placeholder: "विवरण दर्ज करें...", btnSearch: "रिकॉर्ड खोजें",
+                statusPortalHeading: "आवेदन की स्थिति ट्रैक करें", lblSearchHelp: "आवेदन संख्या / मोबाइल नंबर / आधार द्वारा खोजें",
+                searchKey_placeholder: "विवरण दर्ज करें...", btnSearch: "खोजें",
                 deptLoginHeading: "विभागीय डैशबोर्ड सुरक्षित साइन-इन", lblSelectDept: "विभाग का चयन करें *",
                 optChooseDept: "-- विभाग चुनें --", optDept1: "संचालनालय गैस राहत (प्रारंभिक संवीक्षा)",
                 optDept2: "कमला नेहरू अस्पताल (किडनी सत्यापन)", optDept3: "मेडिकल वेरिफिकेशन बोर्ड (कैंसर/पल्मोनरी सत्यापन)",
@@ -974,95 +1022,17 @@
                 lblUsername: "यूज़रनेम / लॉगिन आईडी", lblPassword: "पासवर्ड", deptPass_placeholder: "पासवर्ड दर्ज करें",
                 btnDeptLogin: "लॉगिन करें", lblActiveWorkspace: "सक्रिय कार्यक्षेत्र:", btnLogout: "लॉगआउट",
                 lblInboundApp: "आवक आवेदन (Queue)", noCaseSelected: "विवरण और दस्तावेज़ देखने के लिए साइड पैनल से एक आवेदन चुनें।",
+                lblViewerApplicant: "आवेदक का नाम:",
                 lblFooterCredit: "Website Developed and maintained By - Bhopal Gas Tragedy Relief & Rehabilitation Department, Bhopal, Govt. Of Madhya Pradesh",
                 lblVisitorText: "Total Visits / कुल आगंतुक:"
             }
         };
 
-        // Initialize Firebase Recaptcha Verifiers for Phone Auth
-        function getFormRecaptcha() {
-            if (!window.formRecaptchaVerifier && window.RecaptchaVerifier) {
-                window.formRecaptchaVerifier = new window.RecaptchaVerifier(window.firebaseAuth, 'recaptcha-container-form', {
-                    'size': 'invisible'
-                });
-            }
-            return window.formRecaptchaVerifier;
-        }
-
-        function getStatusRecaptcha() {
-            if (!window.statusRecaptchaVerifier && window.RecaptchaVerifier) {
-                window.statusRecaptchaVerifier = new window.RecaptchaVerifier(window.firebaseAuth, 'recaptcha-container-status', {
-                    'size': 'invisible'
-                });
-            }
-            return window.statusRecaptchaVerifier;
-        }
-
-        // Send Mobile OTP for Patient Submission Form
-        window.sendFormMobileOTP = function() {
-            const mobile = document.getElementById('pMobile').value.trim();
-            if (!/^[0-9]{10}$/.test(mobile)) {
-                alert("Please enter a valid 10-digit mobile number first.");
-                return;
-            }
-
-            const formattedPhone = "+91" + mobile;
-            const btn = document.getElementById('btnSendFormOtp');
-            btn.disabled = true;
-            btn.innerText = "⏳ Sending OTP...";
-
-            const appVerifier = getFormRecaptcha();
-
-            window.signInWithPhoneNumber(window.firebaseAuth, formattedPhone, appVerifier)
-                .then((confirmationResult) => {
-                    formConfirmationResult = confirmationResult;
-                    document.getElementById('formOtpSection').classList.remove('hidden-section');
-                    document.getElementById('formOtpStatus').innerText = "✓ SMS OTP Sent to +91 " + mobile + ". Enter code below:";
-                    btn.innerText = "🔄 Resend OTP";
-                    btn.disabled = false;
-                })
-                .catch((error) => {
-                    console.error("Firebase OTP Send Error:", error);
-                    alert("OTP Delivery Error: " + error.message);
-                    btn.disabled = false;
-                    btn.innerText = "📱 Send OTP";
-                });
-        };
-
-        // Verify Mobile OTP for Form
-        window.verifyFormMobileOTP = function() {
-            const otpCode = document.getElementById('formOtpInput').value.trim();
-            if (!otpCode || otpCode.length !== 6) {
-                alert("Please enter a valid 6-digit OTP code.");
-                return;
-            }
-
-            if (!formConfirmationResult) {
-                alert("OTP Session expired. Please click 'Send OTP' again.");
-                return;
-            }
-
-            formConfirmationResult.confirm(otpCode)
-                .then((result) => {
-                    isFormMobileOtpVerified = true;
-                    document.getElementById('formOtpStatus').innerText = "✓ Mobile Verified Successfully!";
-                    document.getElementById('formOtpStatus').className = "text-xs font-bold text-emerald-600 mt-1 block";
-                    document.getElementById('pMobile').readOnly = true;
-                    document.getElementById('formOtpInput').disabled = true;
-                    document.getElementById('btnVerifyFormOtp').disabled = true;
-                    alert("Success: Mobile Number Verified Successfully via Firebase OTP!");
-                })
-                .catch((error) => {
-                    alert("Invalid OTP! Please enter correct code.");
-                });
-        };
-
-        // File Size Validation strictly for 500 KB Limit
         function validateAndSelectFile(inputEl, btnId) {
             const btn = document.getElementById(btnId);
             if (inputEl.files && inputEl.files.length > 0) {
                 const file = inputEl.files[0];
-                const maxSizeBytes = 500 * 1024; // 500 KB
+                const maxSizeBytes = 500 * 1024;
 
                 if (file.size > maxSizeBytes) {
                     alert("Error: File larger than 500 KB! Please choose a file smaller than 500 KB.");
@@ -1199,12 +1169,12 @@
             'hosp_pulmo': 'Medical Verification Board (Cancer/Pulmonary)',
             'dir_compile': 'Directorate Gas Relief (Compilation)',
             'welfare_comm': 'Welfare Commissioner (Final Decision)',
-            'completed_disbursed': 'Completed / Approved & Disbursed',
+            'completed_disbursed': 'Approved & Disbursed (Completed)',
             'patient_portal_correction': 'Applicant Window (Correction Needed)'
         };
 
         window.onload = function() {
-            generateCaptcha(); generateDeptCaptcha(); updateDashboard(); switchView('patient-portal'); changeLanguage();
+            generateCaptcha(); generateMobileCaptcha(); generateDeptCaptcha(); updateDashboard(); switchView('patient-portal'); changeLanguage();
         };
 
         function switchView(viewId) {
@@ -1220,6 +1190,37 @@
             const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
             let code = ''; for (let i = 0; i < 5; i++) code += chars.charAt(Math.floor(Math.random() * chars.length));
             currentCaptcha = code; document.getElementById('captchaCode').innerText = code;
+        }
+
+        function generateMobileCaptcha() {
+            const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
+            let code = ''; for (let i = 0; i < 5; i++) code += chars.charAt(Math.floor(Math.random() * chars.length));
+            currentMobileCaptcha = code;
+            const el = document.getElementById('mobileCaptchaCode');
+            if (el) el.innerText = code;
+        }
+
+        function verifyMobileCaptcha() {
+            const mobile = document.getElementById('pMobile').value.trim();
+            if (!/^[0-9]{10}$/.test(mobile)) { alert("Enter 10 Digit Valid Mobile No. first."); return; }
+            
+            const inputVal = document.getElementById('mobileCaptchaInput').value.trim().toUpperCase();
+            const label = document.getElementById('mobileCaptchaStatus');
+
+            if (inputVal === "" || inputVal !== currentMobileCaptcha) {
+                alert("Security Error: Please enter valid Mobile Verification CAPTCHA code.");
+                isMobileCaptchaVerified = false;
+                generateMobileCaptcha();
+                return;
+            }
+
+            isMobileCaptchaVerified = true;
+            label.innerText = "✓ Mobile Verified / मोबाइल सत्यापित";
+            label.className = "text-xs font-bold text-emerald-600 block sm:inline";
+            document.getElementById('mobileCaptchaInput').disabled = true;
+            document.getElementById('btnVerifyMobileCaptcha').disabled = true;
+            document.getElementById('btnVerifyMobileCaptcha').classList.add('opacity-40');
+            alert("Success: Mobile CAPTCHA verified successfully!");
         }
 
         function generateDeptCaptcha() {
@@ -1246,7 +1247,12 @@
             }
         }
 
-        // SUBMIT PATIENT APPLICATION
+        function simulateSMSAlert(mobileNumber, appNo, statusType, remarks) {
+            setTimeout(() => {
+                alert(`📱 [REAL-TIME MOBILE SMS ALERT SENT TO: +91 ${mobileNumber}]\n--------------------------------------------------\nApplication No: ${appNo}\nStatus Notification: ${statusType}\nMessage/Remarks: ${remarks}\n--------------------------------------------------\nसंचालनालय आयुक्त गैस राहत एवं पुनर्वास विभाग, म.प्र.`);
+            }, 800);
+        }
+
         async function handlePatientSubmit(e) {
             e.preventDefault();
             const submitBtn = document.getElementById('btnSubmitApp');
@@ -1260,7 +1266,7 @@
 
                 const mobile = document.getElementById('pMobile').value.trim();
                 if (!/^[0-9]{10}$/.test(mobile)) { alert("Enter 10 Digit Valid Mobile No."); return; }
-                if (!isFormMobileOtpVerified) { alert('Please verify Mobile Number via Firebase OTP first.'); return; }
+                if (!isMobileCaptchaVerified) { alert('Please verify Mobile CAPTCHA code first.'); return; }
                 
                 const rawAadhaar = document.getElementById('pAadhaar').value.trim();
                 if (!/^[0-9]{12}$/.test(rawAadhaar)) { alert("Enter 12 Digit Valid Aadhaar No."); return; }
@@ -1288,11 +1294,10 @@
                     alert('Invalid Security CAPTCHA!'); generateCaptcha(); return;
                 }
 
-                // Check Mandatory File Uploads
                 const requiredDocKeys = ['aadhaar', 'medical', 'antimAadesh', 'proRata'];
                 for (let reqKey of requiredDocKeys) {
                     if (!window.uploadedTempDocs[reqKey]) {
-                        alert(`Please select and click 'Upload' for all mandatory documents (Aadhaar, Medical, Antim Aadesh, Pro Rata).`);
+                        alert(`Please select and click 'Upload' for all mandatory documents.`);
                         return;
                     }
                 }
@@ -1303,12 +1308,11 @@
 
                 const appNo = 'BGT-' + Math.floor(100000 + Math.random() * 900000);
                 const submissionDate = new Date().toLocaleString();
-                const isoDate = new Date().toISOString().split('T')[0]; // For MIS Report filtering
 
                 const newApp = {
                     appNo: appNo, 
                     receivedDate: submissionDate,
-                    createdDateIso: isoDate,
+                    createdTimestamp: Date.now(),
                     claimantName: claimantName,
                     claimantRelation: claimantRelation,
                     name: document.getElementById('pName').value.trim(), 
@@ -1323,6 +1327,7 @@
                     ailment: document.getElementById('pAilment').value,
                     isDeceased: isDeceased,
                     isNewUnread: true,
+                    ptRepliedFlash: false,
                     fileName: window.uploadedTempDocs.aadhaar ? window.uploadedTempDocs.aadhaar.fileName : 'doc.pdf', 
                     status: 'In Progress', 
                     currentStage: 'dir_scrutiny',
@@ -1331,10 +1336,9 @@
                     hasNewFile: false,
                     heldByOffice: '', 
                     deptFiles: [],
-                    history: [{ stage: 'Patient Submission', remarks: 'Online application submitted successfully with OTP verified phone.', date: submissionDate }]
+                    history: [{ stage: 'Patient Submission', remarks: 'Online application submitted successfully with documents.', date: submissionDate }]
                 };
 
-                // Save to Cloud Firestore
                 if (typeof window.saveAppToCloud === 'function') {
                     const saved = await window.saveAppToCloud(newApp, window.uploadedTempDocs);
                     if (!saved) {
@@ -1342,6 +1346,8 @@
                         return;
                     }
                 }
+                
+                simulateSMSAlert(mobile, appNo, "APPLICATION SUBMITTED SUCCESSFULLY", "Your application has been registered for ex-gratia processing. Save your application number.");
 
                 document.getElementById('resAppNo').innerText = appNo;
                 document.getElementById('successBox').classList.remove('hidden-section');
@@ -1363,9 +1369,14 @@
                     }
                 });
 
-                isFormMobileOtpVerified = false; 
-                document.getElementById('pMobile').readOnly = false;
-                document.getElementById('formOtpSection').classList.add('hidden-section');
+                isMobileCaptchaVerified = false; 
+                generateMobileCaptcha();
+                document.getElementById('mobileCaptchaInput').value = '';
+                document.getElementById('mobileCaptchaInput').disabled = false;
+                document.getElementById('btnVerifyMobileCaptcha').disabled = false;
+                document.getElementById('btnVerifyMobileCaptcha').classList.remove('opacity-40');
+                document.getElementById('mobileCaptchaStatus').innerText = "Status: Unverified";
+                document.getElementById('mobileCaptchaStatus').className = "text-xs font-bold text-red-600 block sm:inline";
 
                 generateCaptcha(); 
                 updateDashboard();
@@ -1386,202 +1397,6 @@
                 submitBtn.disabled = false;
                 submitBtn.innerHTML = "Submit Application";
                 submitBtn.className = "w-full bg-green-700 hover:bg-green-600 text-white font-bold py-2.5 rounded transition cursor-pointer text-base shadow-md";
-            }
-        }
-
-        // ================= STATUS CHECK WITH MOBILE OTP LOCK =================
-        function initiateStatusCheck() {
-            const key = document.getElementById('searchKey').value.trim();
-            if (!key) {
-                alert("Please enter Application No. or Mobile number.");
-                return;
-            }
-
-            const db = window.getAppsData();
-            const record = db.find(a => a.appNo === key || a.mobile === key);
-
-            if (!record) {
-                document.getElementById('statusOtpBox').classList.add('hidden-section');
-                document.getElementById('statusResult').classList.remove('hidden-section');
-                document.getElementById('statusResult').innerHTML = `<p class="text-red-600 font-bold text-center">No record found matching: ${key}</p>`;
-                return;
-            }
-
-            pendingStatusRecord = record;
-            isStatusMobileOtpVerified = false;
-
-            // Mask Mobile Number for Privacy
-            const mob = record.mobile;
-            const masked = mob.substring(0, 2) + "******" + mob.substring(8);
-            document.getElementById('statusMaskedMobile').innerText = masked;
-
-            document.getElementById('statusResult').classList.add('hidden-section');
-            document.getElementById('statusOtpBox').classList.remove('hidden-section');
-            document.getElementById('statusOtpMsg').innerText = "Click 'Bhejo Mobile OTP' to receive SMS code on registered mobile.";
-        }
-
-        window.sendStatusMobileOTP = function() {
-            if (!pendingStatusRecord) return;
-
-            const formattedPhone = "+91" + pendingStatusRecord.mobile;
-            const btn = document.getElementById('btnSendStatusOtp');
-            btn.disabled = true;
-            btn.innerText = "⏳ Sending OTP...";
-
-            const appVerifier = getStatusRecaptcha();
-
-            window.signInWithPhoneNumber(window.firebaseAuth, formattedPhone, appVerifier)
-                .then((confirmationResult) => {
-                    statusConfirmationResult = confirmationResult;
-                    document.getElementById('statusOtpMsg').innerText = "✓ OTP Sent to mobile ending in " + pendingStatusRecord.mobile.substring(6) + ".";
-                    btn.innerText = "🔄 Resend OTP";
-                    btn.disabled = false;
-                })
-                .catch((error) => {
-                    console.error("Status OTP Error:", error);
-                    alert("OTP Error: " + error.message);
-                    btn.disabled = false;
-                    btn.innerText = "📱 Bhejo Mobile OTP";
-                });
-        };
-
-        window.verifyStatusMobileOTP = function() {
-            const code = document.getElementById('statusOtpInput').value.trim();
-            if (!code || code.length !== 6) {
-                alert("Please enter a valid 6-digit OTP code.");
-                return;
-            }
-
-            if (!statusConfirmationResult) {
-                alert("OTP session expired. Please click 'Bhejo Mobile OTP' again.");
-                return;
-            }
-
-            statusConfirmationResult.confirm(code)
-                .then((result) => {
-                    isStatusMobileOtpVerified = true;
-                    document.getElementById('statusOtpBox').classList.add('hidden-section');
-                    renderProtectedStatusDetails(pendingStatusRecord);
-                })
-                .catch((error) => {
-                    alert("Invalid OTP Code! Security verification failed.");
-                });
-        };
-
-        function renderProtectedStatusDetails(record) {
-            const box = document.getElementById('statusResult');
-            box.classList.remove('hidden-section');
-
-            let currentActiveDeskName = deptDeskLabels[record.currentStage] || record.currentStage;
-
-            // WelFare Commissioner Approval Check: Completed status display
-            let isCompleted = (record.currentStage === 'completed_disbursed' || record.status === 'Completed');
-            
-            let statusBadge = '';
-            if (isCompleted) {
-                statusBadge = '<span class="px-2.5 py-1 rounded text-xs font-black bg-emerald-100 text-emerald-900 border border-emerald-400">✓ COMPLETED / DISBURSED</span>';
-            } else if (record.objectionRaised) {
-                statusBadge = '<span class="px-2 py-0.5 rounded text-xs font-bold bg-amber-100 text-amber-800 border border-amber-300">On Hold</span>';
-            } else {
-                statusBadge = '<span class="px-2 py-0.5 rounded text-xs font-bold bg-blue-100 text-blue-800 border border-blue-300">In Progress</span>';
-            }
-
-            let ptRestrictedViewHtml = '';
-            if (record.deptFiles && record.deptFiles.length > 0) {
-                ptRestrictedViewHtml = `
-                    <div class="mt-3 p-3 bg-zinc-100 rounded border border-zinc-300 shadow-inner">
-                        <p class="text-xs font-bold text-zinc-800 uppercase mb-2 border-b pb-1">📜 Issued Official Action Documents (विभागीय दस्तावेज़ सूची):</p>
-                        <ul class="space-y-1 text-xs text-gray-700">`;
-                record.deptFiles.forEach(f => {
-                    ptRestrictedViewHtml += `<li class="p-1.5 bg-white rounded border border-gray-200 font-mono text-[11px] flex justify-between items-center">
-                        <span>📄 ${f.byOffice} - ${f.fileName} (${f.date})</span>
-                        <button onclick="viewPatientFile('${record.appNo}', '${f.id}')" class="bg-blue-800 text-white text-[10px] px-2 py-0.5 rounded font-bold">View Document</button>
-                    </li>`;
-                });
-                ptRestrictedViewHtml += `</ul></div>`;
-            }
-
-            let objectionBoxHtml = '';
-            if (record.objectionRaised) {
-                objectionBoxHtml = `
-                    <div class="p-3 bg-amber-50 border-l-4 border-l-amber-500 text-amber-900 rounded my-3 shadow-sm">
-                        <p class="font-bold text-sm">⚠️ OBJECTION / DEFICIENCY MESSAGE (विभाग की आपत्ति):</p>
-                        <p class="text-xs italic bg-white p-2 border rounded font-mono my-1 font-bold text-red-900">${record.objectionRemarks}</p>
-                        
-                        <div class="mt-3 p-3 bg-white border border-gray-200 rounded text-gray-800">
-                            <label class="block text-xs font-bold uppercase mb-1">Re-upload Corrected/Missing Document (PDF Only, Max 500 KB):</label>
-                            <input type="file" id="reUploadFileField" accept=".pdf" onchange="validateAndSelectFile(this, 'btnSubmitReupload')" class="w-full text-xs p-1.5 border border-gray-300 rounded mb-2 focus:outline-none">
-                            
-                            <label class="block text-xs font-bold uppercase mb-1">Comment / Reply to Objection (अपना उत्तर / टिप्पणी दर्ज करें) *:</label>
-                            <textarea id="reUploadCommentField" rows="2" placeholder="Enter your response / explanation here..." class="w-full p-2 border border-gray-300 rounded text-xs mb-2"></textarea>
-
-                            <button id="btnSubmitReupload" onclick="executePatientReupload('${record.appNo}')" class="w-full bg-blue-700 hover:bg-blue-600 text-white text-xs font-bold py-2 rounded cursor-pointer shadow transition">Submit Document & Comment</button>
-                        </div>
-                    </div>`;
-            }
-
-            box.innerHTML = `
-                <div class="border-b pb-3 mb-3">
-                    <div class="flex justify-between items-start">
-                        <h3 class="text-lg font-bold text-blue-900">Patient: ${record.name} <span class="text-gray-500 font-mono text-sm">(${record.appNo})</span></h3>
-                        ${statusBadge}
-                    </div>
-                    <p class="text-xs text-amber-950 font-bold mt-1">Claimant Name: ${record.claimantName || 'N/A'} (${record.claimantRelation || 'N/A'})</p>
-                    <p class="text-xs text-gray-600 font-bold">Father/Spouse: ${record.fatherSpouse || 'N/A'} | Ward No: ${record.wardNo || 'N/A'}</p>
-                    <p class="text-xs text-red-900 font-bold">Disease: ${record.diseaseName || 'N/A'}</p>
-                    <p class="text-sm mt-1">Application Received Date: <strong class="text-gray-700">${record.receivedDate || 'N/A'}</strong></p>
-                    <p class="text-sm mt-1">Live Processing Stage: <strong class="text-indigo-900">${isCompleted ? 'COMPLETED (Disbursed)' : currentActiveDeskName}</strong></p>
-                    ${objectionBoxHtml}
-                    ${ptRestrictedViewHtml}
-                </div>`;
-        }
-
-        async function executePatientReupload(appNo) {
-            const fileField = document.getElementById('reUploadFileField');
-            const commentField = document.getElementById('reUploadCommentField');
-
-            if (!fileField || !fileField.files.length) { alert("Please select a missing/corrected PDF file first."); return; }
-            if (fileField.files[0].size > 500 * 1024) { alert("Error: File larger than 500 KB!"); return; }
-
-            const comment = commentField ? commentField.value.trim() : "";
-            if (!comment) { alert("Please enter your comment / explanation response."); return; }
-
-            const db = window.getAppsData();
-            const app = db.find(a => a.appNo === appNo);
-            if (app) {
-                const uploadedFile = fileField.files[0];
-                const base64Data = await fileToBase64(uploadedFile);
-
-                await window.saveDocFileToSubcollection(appNo, 'corrected', {
-                    title: "Corrected Document",
-                    fileName: uploadedFile.name,
-                    url: base64Data
-                });
-
-                app.newFileName = uploadedFile.name;
-                app.hasNewFile = true;
-                app.objectionRaised = false;
-                
-                if (app.heldByOffice) {
-                    app.currentStage = app.heldByOffice;
-                }
-                
-                app.status = 'In Progress';
-                app.history.push({ 
-                    stage: 'Applicant Correction Upload', 
-                    remarks: `Submitted requested corrected document: [${uploadedFile.name}]. Comment: "${comment}". Returned to review queue.`, 
-                    date: new Date().toLocaleString() 
-                });
-
-                if (typeof window.updateAppInCloud === 'function') {
-                    await window.updateAppInCloud(app.appNo, app);
-                }
-
-                alert("Document and response submitted successfully! Returned to department review queue.");
-                renderProtectedStatusDetails(app); 
-                updateDashboard();
-            } else {
-                alert("Error: Application record not found.");
             }
         }
 
@@ -1651,6 +1466,108 @@
             }
         }
 
+        // TRACK APPLICATION STATUS: DEPT CONFIDENTIAL FILES HIDDEN (ONLY SHOW OBJECTION ATTACHMENTS WHEN HOLD REASON RETURNED)
+        function trackApplication() {
+            const key = document.getElementById('searchKey').value.trim();
+            if (!key) return;
+            const db = window.getAppsData();
+            const record = db.find(a => a.appNo === key || a.mobile === key);
+            const box = document.getElementById('statusResult');
+            box.classList.remove('hidden-section');
+
+            if (!record) { box.innerHTML = `<p class="text-red-600 font-bold">No record matched.</p>`; return; }
+
+            let isCompleted = (record.currentStage === 'completed_disbursed' || record.status === 'Completed');
+            let currentActiveDeskName = isCompleted ? "Approved & Completed (Disbursed)" : (deptDeskLabels[record.currentStage] || record.currentStage);
+
+            let objectionBoxHtml = '';
+            if (record.objectionRaised) {
+                objectionBoxHtml = `
+                    <div class="p-3 bg-amber-50 border-l-4 border-l-amber-500 text-amber-900 rounded my-3 shadow-sm">
+                        <p class="font-bold text-sm">⚠️ OBJECTION / DEFICIENCY MESSAGE (विभाग की आपत्ति):</p>
+                        <p class="text-xs italic bg-white p-2 border rounded font-mono my-1 font-bold text-red-900">${record.objectionRemarks}</p>
+                        
+                        <div class="mt-3 p-3 bg-white border border-gray-200 rounded text-gray-800">
+                            <label class="block text-xs font-bold uppercase mb-1">Re-upload Corrected/Missing Document (PDF Only, Max 500 KB):</label>
+                            <input type="file" id="reUploadFileField" accept=".pdf" onchange="validateAndSelectFile(this, 'btnSubmitReupload')" class="w-full text-xs p-1.5 border border-gray-300 rounded mb-2 focus:outline-none">
+                            
+                            <label class="block text-xs font-bold uppercase mb-1">Comment / Reply to Objection (अपना उत्तर / टिप्पणी दर्ज करें) *:</label>
+                            <textarea id="reUploadCommentField" rows="2" placeholder="Enter your response / explanation here..." class="w-full p-2 border border-gray-300 rounded text-xs mb-2"></textarea>
+
+                            <button id="btnSubmitReupload" onclick="executePatientReupload('${record.appNo}')" class="w-full bg-blue-700 hover:bg-blue-600 text-white text-xs font-bold py-2 rounded cursor-pointer shadow transition">Submit Document & Comment</button>
+                        </div>
+                    </div>`;
+            }
+
+            let statusBadge = isCompleted ? 
+                '<span class="px-2.5 py-1 rounded text-xs font-extrabold bg-emerald-100 text-emerald-800 border border-emerald-400">Completed (Approval Disbursed)</span>' :
+                (record.objectionRaised ? 
+                '<span class="px-2 py-0.5 rounded text-xs font-bold bg-amber-100 text-amber-800 border border-amber-300">On Hold</span>' : 
+                '<span class="px-2 py-0.5 rounded text-xs font-bold bg-blue-100 text-blue-800 border border-blue-300">In Process</span>');
+
+            box.innerHTML = `
+                <div class="border-b pb-3 mb-3">
+                    <h3 class="text-lg font-bold text-blue-900">Patient: ${record.name} <span class="text-gray-500 font-mono text-sm">(${record.appNo})</span></h3>
+                    <p class="text-xs text-amber-950 font-bold">Claimant Name: ${record.claimantName || 'N/A'} (${record.claimantRelation || 'N/A'})</p>
+                    <p class="text-xs text-gray-600 font-bold">Father/Spouse: ${record.fatherSpouse || 'N/A'} | Ward No: ${record.wardNo || 'N/A'}</p>
+                    <p class="text-xs text-red-900 font-bold">Disease: ${record.diseaseName || 'N/A'}</p>
+                    <p class="text-sm mt-1">Application Received Date: <strong class="text-gray-700">${record.receivedDate || 'N/A'}</strong></p>
+                    <p class="text-sm mt-1">Live Processing Department: <strong class="text-indigo-900">${currentActiveDeskName}</strong></p>
+                    <p class="text-sm mt-1">Live Status: ${statusBadge}</p>
+                    ${objectionBoxHtml}
+                </div>`;
+        }
+
+        async function executePatientReupload(appNo) {
+            const fileField = document.getElementById('reUploadFileField');
+            const commentField = document.getElementById('reUploadCommentField');
+
+            if (!fileField || !fileField.files.length) { alert("Please select a missing/corrected PDF file first."); return; }
+            if (fileField.files[0].size > 500 * 1024) { alert("Error: File larger than 500 KB!"); return; }
+
+            const comment = commentField ? commentField.value.trim() : "";
+            if (!comment) { alert("Please enter your comment / explanation response."); return; }
+
+            const db = window.getAppsData();
+            const app = db.find(a => a.appNo === appNo);
+            if (app) {
+                const uploadedFile = fileField.files[0];
+                const base64Data = await fileToBase64(uploadedFile);
+
+                await window.saveDocFileToSubcollection(appNo, 'corrected', {
+                    title: "Corrected Document",
+                    fileName: uploadedFile.name,
+                    url: base64Data
+                });
+
+                app.newFileName = uploadedFile.name;
+                app.hasNewFile = true;
+                app.ptRepliedFlash = true; // Set FLASH Flag
+                app.objectionRaised = false; // Hold Removed, now In Progress
+                
+                if (app.heldByOffice) {
+                    app.currentStage = app.heldByOffice;
+                }
+                
+                app.status = 'In Progress';
+                app.history.push({ 
+                    stage: 'Applicant Correction Upload', 
+                    remarks: `Submitted requested corrected document: [${uploadedFile.name}]. Comment: "${comment}". Returned to review queue.`, 
+                    date: new Date().toLocaleString() 
+                });
+
+                if (typeof window.updateAppInCloud === 'function') {
+                    await window.updateAppInCloud(app.appNo, app);
+                }
+
+                alert("Document and response submitted successfully! Returned to department review queue.");
+                trackApplication(); 
+                updateDashboard();
+            } else {
+                alert("Error: Application record not found.");
+            }
+        }
+
         function handleDeptLogin(e) {
             e.preventDefault();
             const u = document.getElementById('deptUser').value.trim();
@@ -1668,7 +1585,6 @@
                     switchView('director-workspace');
                     updateDashboard();
                     window.loadDirectorDashboard();
-                    window.generateMisReport();
                 } else {
                     document.getElementById('activeDeptTitle').innerText = creds[u].label;
                     switchView('dept-workspace'); 
@@ -1677,91 +1593,7 @@
             } else { alert('Authentication Failed! Incorrect Password.'); }
         }
 
-        // ================= DIRECTOR ADMIN MIS REPORT GENERATOR LOGIC =================
-        window.generateMisReport = function() {
-            const periodSelect = document.getElementById('misPeriodSelect');
-            if (!periodSelect) return;
-
-            const period = periodSelect.value;
-            const ailmentFilter = document.getElementById('misAilmentFilter').value;
-            const startBox = document.getElementById('misDateStartBox');
-            const endBox = document.getElementById('misDateEndBox');
-
-            if (period === 'CUSTOM') {
-                startBox.classList.remove('hidden-section');
-                endBox.classList.remove('hidden-section');
-            } else {
-                startBox.classList.add('hidden-section');
-                endBox.classList.add('hidden-section');
-            }
-
-            const db = window.getAppsData();
-            const todayStr = new Date().toISOString().split('T')[0];
-            const sevenDaysAgo = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString().split('T')[0];
-
-            let filtered = db;
-
-            // Date filtering
-            if (period === 'TODAY') {
-                filtered = filtered.filter(a => a.createdDateIso === todayStr);
-            } else if (period === 'WEEKLY') {
-                filtered = filtered.filter(a => a.createdDateIso >= sevenDaysAgo);
-            } else if (period === 'CUSTOM') {
-                const sDate = document.getElementById('misStartDate').value;
-                const eDate = document.getElementById('misEndDate').value;
-                if (sDate) filtered = filtered.filter(a => a.createdDateIso >= sDate);
-                if (eDate) filtered = filtered.filter(a => a.createdDateIso <= eDate);
-            }
-
-            // Ailment filtering
-            if (ailmentFilter !== 'ALL') {
-                filtered = filtered.filter(a => a.ailment === ailmentFilter);
-            }
-
-            // Calculation
-            const total = filtered.length;
-            const completed = filtered.filter(a => a.currentStage === 'completed_disbursed' || a.status === 'Completed').length;
-            const rejected = filtered.filter(a => a.currentStage === 'patient_portal_correction' || (a.status && a.status.includes('Rejected'))).length;
-            const onHold = filtered.filter(a => a.objectionRaised === true).length;
-            const inProcess = total - (completed + rejected);
-
-            const container = document.getElementById('misReportContainer');
-            container.innerHTML = `
-                <div class="grid grid-cols-2 md:grid-cols-5 gap-2 text-center font-bold">
-                    <div class="p-2 bg-blue-100 text-blue-900 rounded border border-blue-300">
-                        Total Inflow: <span class="text-base block font-black">${total}</span>
-                    </div>
-                    <div class="p-2 bg-amber-100 text-amber-900 rounded border border-amber-300">
-                        In-Process: <span class="text-base block font-black">${inProcess}</span>
-                    </div>
-                    <div class="p-2 bg-orange-100 text-orange-900 rounded border border-orange-300">
-                        On Hold: <span class="text-base block font-black">${onHold}</span>
-                    </div>
-                    <div class="p-2 bg-emerald-100 text-emerald-900 rounded border border-emerald-300">
-                        Completed: <span class="text-base block font-black">${completed}</span>
-                    </div>
-                    <div class="p-2 bg-red-100 text-red-900 rounded border border-red-300">
-                        Rejected: <span class="text-base block font-black">${rejected}</span>
-                    </div>
-                </div>
-                <p class="text-[11px] text-gray-500 italic mt-2 text-right">Report Generated Date: ${new Date().toLocaleString()}</p>
-            `;
-        };
-
-        window.printMisReport = function() {
-            const printContent = document.getElementById('misReportContainer').innerHTML;
-            const win = window.open('', '', 'height=500,width=800');
-            win.document.write('<html><head><title>Bhopal Gas Relief - MIS Audit Report</title>');
-            win.document.write('<script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"><\/script>');
-            win.document.write('</head><body class="p-6">');
-            win.document.write('<h2 class="text-xl font-bold mb-2">Bhopal Gas Tragedy Relief & Rehabilitation Department</h2>');
-            win.document.write('<h3 class="text-base font-bold mb-4 text-blue-900">Periodical MIS Application Status Audit Report</h3>');
-            win.document.write(printContent);
-            win.document.write('</body></html>');
-            win.document.close();
-            win.print();
-        };
-
+        // DIRECTOR ADMIN LISTING WITH COMPLETED STATUS FOR WELFARE COMMISSIONER APPROVAL
         window.loadDirectorDashboard = function() {
             const db = window.getAppsData();
             const tbody = document.getElementById('directorLiveTableBody');
@@ -1775,16 +1607,13 @@
 
             db.forEach((app, index) => {
                 let isCompleted = (app.currentStage === 'completed_disbursed' || app.status === 'Completed');
-                let deskName = isCompleted ? 'Completed (Disbursed)' : (deptDeskLabels[app.currentStage] || app.currentStage);
+                let deskName = isCompleted ? "Approved & Completed" : (deptDeskLabels[app.currentStage] || app.currentStage);
                 
-                let statusBadge = '';
-                if (isCompleted) {
-                    statusBadge = '<span class="px-2 py-0.5 rounded text-[10px] font-black bg-emerald-100 text-emerald-900 border border-emerald-400">Completed</span>';
-                } else if (app.objectionRaised) {
-                    statusBadge = '<span class="px-2 py-0.5 rounded text-[10px] font-bold bg-amber-100 text-amber-800 border border-amber-300">On Hold</span>';
-                } else {
-                    statusBadge = '<span class="px-2 py-0.5 rounded text-[10px] font-bold bg-blue-100 text-blue-800 border border-blue-300">In Progress</span>';
-                }
+                let statusBadge = isCompleted ? 
+                    '<span class="px-2 py-0.5 rounded text-[10px] font-extrabold bg-emerald-100 text-emerald-800 border border-emerald-400">Completed</span>' :
+                    (app.objectionRaised ? 
+                    '<span class="px-2 py-0.5 rounded text-[10px] font-bold bg-amber-100 text-amber-800 border border-amber-300">On Hold</span>' : 
+                    '<span class="px-2 py-0.5 rounded text-[10px] font-bold bg-blue-100 text-blue-800 border border-blue-300">In Progress</span>');
 
                 const tr = document.createElement('tr');
                 tr.className = "border-b border-gray-200 hover:bg-gray-50 text-xs";
@@ -1880,6 +1709,7 @@
             document.getElementById('deptUser').value = document.getElementById('deptSelect').value;
         }
 
+        // DEPT QUEUE RENDERING WITH FLASHING PT REPLIED BADGES
         window.loadDeptQueue = function() {
             const db = window.getAppsData();
             const container = document.getElementById('caseQueueList'); 
@@ -1916,7 +1746,7 @@
                 const card = document.createElement('div');
                 
                 let borderStyle = 'border-l-4 border-l-blue-600 bg-white';
-                let statusBadge = `<span class="text-blue-800 font-bold bg-blue-100 px-1.5 py-0.5 rounded text-[10px]">IN PROGRESS</span>`;
+                let statusBadge = `<span class="text-blue-800 font-bold bg-blue-100 px-1.5 py-0.5 rounded text-[10px]">IN PROCESS</span>`;
 
                 if (app.objectionRaised) {
                     borderStyle = 'border-l-4 border-l-amber-500 bg-amber-50/60';
@@ -1924,6 +1754,11 @@
                 } else if (app.status && app.status.includes('Rejected')) {
                     borderStyle = 'border-l-4 border-l-red-600 bg-red-50/60';
                     statusBadge = `<span class="text-red-800 font-bold bg-red-100 px-1.5 py-0.5 rounded text-[10px]">❌ REJECTED</span>`;
+                }
+
+                let flashRepliedTag = '';
+                if (app.ptRepliedFlash) {
+                    flashRepliedTag = `<span class="bg-amber-500 text-white font-black text-[9px] px-1.5 py-0.5 rounded flash-text uppercase tracking-wider block mt-1">⚡ PT REPLIED / UPDATED</span>`;
                 }
 
                 let newTagHtml = '';
@@ -1939,6 +1774,7 @@
                         ${newTagHtml}
                     </div>
                     <p class="text-[11px] text-amber-950 font-bold">Claimant: ${app.claimantName || 'N/A'}</p>
+                    ${flashRepliedTag}
                     <div class="flex justify-between items-center text-[11px] mt-1">
                         <span class="text-gray-600 font-mono bg-gray-100 px-1.5 py-0.5 rounded border border-gray-200">${app.appNo}</span>
                         ${statusBadge}
@@ -1952,10 +1788,11 @@
             const db = window.getAppsData();
             const app = db.find(a => a.appNo === appNo);
             if (app) {
-                if (app.isNewUnread) {
+                if (app.isNewUnread || app.ptRepliedFlash) {
                     app.isNewUnread = false;
+                    app.ptRepliedFlash = false; // Reset flash on view
                     if (typeof window.updateAppInCloud === 'function') {
-                        window.updateAppInCloud(app.appNo, { isNewUnread: false });
+                        window.updateAppInCloud(app.appNo, { isNewUnread: false, ptRepliedFlash: false });
                     }
                 }
 
@@ -1963,6 +1800,13 @@
                 
                 document.getElementById('noCaseSelected').classList.add('hidden-section');
                 document.getElementById('caseViewerArea').classList.remove('hidden-section');
+
+                const ptRepliedBox = document.getElementById('vPtRepliedFlashBox');
+                if (app.hasNewFile) {
+                    ptRepliedBox.classList.remove('hidden-section');
+                } else {
+                    ptRepliedBox.classList.add('hidden-section');
+                }
                 
                 document.getElementById('vClaimantName').innerText = app.claimantName || 'N/A';
                 document.getElementById('vName').innerText = app.name;
@@ -1978,10 +1822,7 @@
                 document.getElementById('vBmhrc').innerText = app.bmhrc || 'N/A';
                 
                 const statusBox = document.getElementById('vCurrentStatus');
-                if (app.currentStage === 'completed_disbursed' || app.status === 'Completed') {
-                    statusBox.innerText = "Completed";
-                    statusBox.className = "text-[11px] font-bold px-2.5 py-1.5 rounded bg-emerald-100 text-emerald-900 border border-emerald-300 shadow-xs block";
-                } else if (app.objectionRaised) {
+                if (app.objectionRaised) {
                     statusBox.innerText = "On Hold";
                     statusBox.className = "text-[11px] font-bold px-2.5 py-1.5 rounded bg-amber-100 text-amber-900 border border-amber-300 shadow-xs block";
                 } else {
@@ -2058,7 +1899,7 @@
             }
         }
 
-        // WORKFLOW ACTION PROCESSING WITH WELFARE COMMISSIONER APPROVAL FIX
+        // WORKFLOW ACTION PROCESSING WITH WELFARE COMMISSIONER FINAL COMPLETED APPROVAL
         async function processCaseAction(decision) {
             if (!selectedApplicationId) return;
             const remarks = document.getElementById('deptRemarks').value.trim();
@@ -2081,23 +1922,33 @@
                 app.status = 'Rejected / Discrepancy Found'; 
                 app.currentStage = 'patient_portal_correction'; 
                 app.objectionRaised = false;
+                simulateSMSAlert(app.mobile, app.appNo, "APPLICATION REJECTED (आवेदन निरस्त)", `Reason: ${remarks}`);
             } else if (decision === 'HOLD') {
                 app.status = 'On Hold';
                 app.objectionRaised = true; 
                 app.objectionRemarks = remarks;
                 app.heldByOffice = window.loggedInDeptUser;
                 app.hasNewFile = false; 
+                app.ptRepliedFlash = false;
+                simulateSMSAlert(app.mobile, app.appNo, "APPLICATION STALLED / ON HOLD (आपत्ति दर्ज)", `Objection: ${remarks}`);
             } else {
                 app.objectionRaised = false;
+                app.ptRepliedFlash = false;
                 app.status = 'In Progress';
+                const oldStage = app.currentStage;
                 
                 if (app.currentStage === 'dir_scrutiny') { app.currentStage = (app.ailment === 'Kidney') ? 'hosp_kidney' : 'hosp_pulmo'; }
                 else if (app.currentStage === 'hosp_kidney' || app.currentStage === 'hosp_pulmo') { app.currentStage = 'dir_compile'; }
                 else if (app.currentStage === 'dir_compile') { app.currentStage = 'welfare_comm'; }
                 else if (app.currentStage === 'welfare_comm') { 
-                    // Welfare Commissioner Final Approval Fix
                     app.currentStage = 'completed_disbursed'; 
-                    app.status = 'Completed'; 
+                    app.status = 'Completed'; // Set Completed after Welfare Commissioner Approval
+                }
+                
+                if (oldStage === 'dir_compile') {
+                    simulateSMSAlert(app.mobile, app.appNo, "VERIFIED AND APPROVED BY GAS RAHAT DEPT", "Your application has been Verified and Approved by Gas Rahat Dept.");
+                } else if (oldStage === 'welfare_comm') {
+                    simulateSMSAlert(app.mobile, app.appNo, "FINAL EX-GRATIA APPROVAL SUCCESSFUL", "Your ex-gratia amount application has received final approval from Welfare Commissioner. Status marked COMPLETED.");
                 }
             }
 
@@ -2113,6 +1964,103 @@
             document.getElementById('caseViewerArea').classList.add('hidden-section');
             document.getElementById('noCaseSelected').classList.remove('hidden-section');
             loadDeptQueue(); updateDashboard();
+        }
+
+        // ================= MIS REPORT GENERATOR LOGIC =================
+        function applyMisPreset(fromId, toId, presetVal) {
+            const now = new Date();
+            let fromDate = new Date();
+            if (presetVal === 'TODAY') {
+                fromDate = now;
+            } else if (presetVal === 'WEEK') {
+                fromDate.setDate(now.getDate() - 7);
+            } else if (presetVal === 'MONTH') {
+                fromDate.setDate(1);
+            }
+            if (presetVal !== 'CUSTOM') {
+                document.getElementById(fromId).value = fromDate.toISOString().split('T')[0];
+                document.getElementById(toId).value = now.toISOString().split('T')[0];
+            }
+        }
+
+        function toggleDeptMisPanel() {
+            const panel = document.getElementById('deptMisPanel');
+            panel.classList.toggle('hidden-section');
+        }
+
+        function closeMisReportModal() {
+            document.getElementById('misReportModal').classList.add('hidden-section');
+        }
+
+        function generateDirectorMisReport() {
+            const from = document.getElementById('dMisFromDate').value;
+            const to = document.getElementById('dMisToDate').value;
+            renderMisReportTable(from, to, "Director Admin Master MIS Summary Report", null);
+        }
+
+        function generateDeptUserMisReport() {
+            const from = document.getElementById('deptMisFrom').value;
+            const to = document.getElementById('deptMisTo').value;
+            const creds = JSON.parse(localStorage.getItem('dept_db'));
+            const label = creds[window.loggedInDeptUser] ? creds[window.loggedInDeptUser].label : 'Department';
+            renderMisReportTable(from, to, `${label} - Desk MIS Report`, window.loggedInDeptUser);
+        }
+
+        function renderMisReportTable(fromDateStr, toDateStr, title, deptFilterKey) {
+            const db = window.getAppsData();
+            let fromTime = fromDateStr ? new Date(fromDateStr + "T00:00:00").getTime() : 0;
+            let toTime = toDateStr ? new Date(toDateStr + "T23:59:59").getTime() : Date.now();
+
+            let records = db.filter(a => {
+                let t = a.createdTimestamp || new Date(a.receivedDate).getTime() || Date.now();
+                let matchesTime = t >= fromTime && t <= toTime;
+                let matchesDept = deptFilterKey ? (a.currentStage === deptFilterKey || a.heldByOffice === deptFilterKey) : true;
+                return matchesTime && matchesDept;
+            });
+
+            document.getElementById('misReportDeskTitle').innerText = title;
+            document.getElementById('misReportDateRange').innerText = `Period: ${fromDateStr || 'Start'} to ${toDateStr || 'Today'} | Total Records: ${records.length}`;
+
+            let html = `
+                <table class="w-full text-xs border border-gray-300 text-left border-collapse">
+                    <thead>
+                        <tr class="bg-gray-100 border-b font-bold">
+                            <th class="p-2 border">#</th>
+                            <th class="p-2 border">App No.</th>
+                            <th class="p-2 border">Claimant Name</th>
+                            <th class="p-2 border">Patient Name</th>
+                            <th class="p-2 border">Ward</th>
+                            <th class="p-2 border">Mobile</th>
+                            <th class="p-2 border">Active Desk</th>
+                            <th class="p-2 border">Status</th>
+                        </tr>
+                    </thead>
+                    <tbody>`;
+
+            if (records.length === 0) {
+                html += `<tr><td colspan="8" class="p-4 text-center text-gray-500 italic">No applications found in the specified date range.</td></tr>`;
+            } else {
+                records.forEach((r, idx) => {
+                    let isComp = (r.currentStage === 'completed_disbursed' || r.status === 'Completed');
+                    let desk = isComp ? "Completed" : (deptDeskLabels[r.currentStage] || r.currentStage);
+                    let st = isComp ? "Completed" : (r.objectionRaised ? "On Hold" : "In Progress");
+                    html += `
+                        <tr class="border-b hover:bg-gray-50">
+                            <td class="p-2 border">${idx + 1}</td>
+                            <td class="p-2 border font-mono font-bold">${r.appNo}</td>
+                            <td class="p-2 border">${r.claimantName || 'N/A'}</td>
+                            <td class="p-2 border">${r.name}</td>
+                            <td class="p-2 border">${r.wardNo || 'N/A'}</td>
+                            <td class="p-2 border font-mono">${r.mobile}</td>
+                            <td class="p-2 border">${desk}</td>
+                            <td class="p-2 border font-bold">${st}</td>
+                        </tr>`;
+                });
+            }
+
+            html += `</tbody></table>`;
+            document.getElementById('misReportTableWrapper').innerHTML = html;
+            document.getElementById('misReportModal').classList.remove('hidden-section');
         }
     </script>
 </body>
